@@ -1,0 +1,24 @@
+DO A BARREL ROLL : - barrel roll ability that will rotate the body of the ship really quickly in the Z axis.
+This will temporarily disable shooting but grant some I frames and reflect projectiles. 
+
+Evasive maneouvers, Rotate in the X axis to "dodge" abilites. This will just give you I frames for some time and prevent shooting.
+
+Beyblade: - Rotate rapidly in the Y axis, while enabled shooting will be disabled, you can press a button while spinning to drop mines, movement speed will be greatly increased. Colliding with enemies will add force to them and send them flying a bit in another direction based off their size and mass and your speed of impact. (rigidbodies). 
+
+standard shooting: - fire shots from turrent 
+
+charged shooting : - press and hold for a charged shot that will do more damage. 
+
+Homing missiles: press to fire homing missiles that will find targets and deal damage. 
+
+Shields up: - activate shields that will protect from damage
+
+EMP: :- emp pulse will be a 360 aoe that will temporarily disable all movement for up to 3 seconds. (mashing keys will help reduce 
+stun)
+
+Get hacked: - Temporarily take control of another users ship for 5 seconds. you can veer them off to and deplete their resources, while 
+active you will be invulnerable for 3 seconds and a sitting duck for the remaining 2. 
+
+Stick drift: - You will move in the opposite direction of your controls for 5 seconds
+
+Overdrive, : - greatly reduce cooldown on your abilities and move faster for a period of time. 
