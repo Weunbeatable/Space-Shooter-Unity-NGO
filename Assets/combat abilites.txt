@@ -22,3 +22,6 @@ active you will be invulnerable for 3 seconds and a sitting duck for the remaini
 Stick drift: - You will move in the opposite direction of your controls for 5 seconds
 
 Overdrive, : - greatly reduce cooldown on your abilities and move faster for a period of time. 
+
+delayed shots: - you can rapidly click the fire key, in this mode projectiles will spawn in, there will be a delay  before they fire off in their
+given direction, longer charge increases speed, size and velocity

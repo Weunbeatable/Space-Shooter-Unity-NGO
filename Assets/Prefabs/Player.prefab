@@ -1,5 +1,36 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &4172904353818348653
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7991666987376081097}
+  m_Layer: 0
+  m_Name: ProjectileSpawnPoint
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7991666987376081097
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4172904353818348653}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0.009, y: 1.047, z: 2.811}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 4330664668969945165}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &4786656441999759011
 GameObject:
   m_ObjectHideFlags: 0
@@ -78,6 +109,7 @@ GameObject:
   - component: {fileID: 6364529844426862324}
   - component: {fileID: 278018043308868145}
   - component: {fileID: 5379658166225888982}
+  - component: {fileID: 7553932014015438739}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -221,6 +253,25 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   inputReader: {fileID: 11400000, guid: 2b0ed51268b2b1f46af1702daa4f5fef, type: 2}
   turretTransform: {fileID: 6956284355916773609}
+--- !u!114 &7553932014015438739
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5646939509000065095}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 184a5448e05559944a9cae94de964928, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  inputReader: {fileID: 11400000, guid: 2b0ed51268b2b1f46af1702daa4f5fef, type: 2}
+  ProjectileSpawnPoint: {fileID: 7991666987376081097}
+  ServerProjectilePrefab: {fileID: 7676071298527537717, guid: fe6bd4559aabaa14fb8bab43f07788c0,
+    type: 3}
+  ClientProjectilePrefab: {fileID: 1113643976150088661, guid: c6efce7e55270de47b4b73d86cc1f9fe,
+    type: 3}
+  projectileSpeed: 30
 --- !u!1001 &1679879308936575346
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -432,7 +483,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
-    m_AddedGameObjects: []
+    m_AddedGameObjects:
+    - targetCorrespondingSourceObject: {fileID: 4935858836924492, guid: c9852089bfb8d074e8b7b63adf7185ef,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 7991666987376081097}
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: c9852089bfb8d074e8b7b63adf7185ef, type: 3}
 --- !u!4 &4330664668969945165 stripped
