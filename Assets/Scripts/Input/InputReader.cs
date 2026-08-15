@@ -49,4 +49,9 @@ public class InputReader : ScriptableObject, IPlayerActions
         // help us figure out where to aim
        AimPosition = context.ReadValue<Vector2>();
     }
+
+    private void OnDisable()
+    {
+        controls.Player.Disable();
+    }
 }
