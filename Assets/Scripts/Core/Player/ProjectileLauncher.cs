@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
 using System;
+using System.IO.Pipes;
 
 public class ProjectileLauncher : NetworkBehaviour
 {
@@ -11,10 +12,16 @@ public class ProjectileLauncher : NetworkBehaviour
     [SerializeField] Transform ProjectileSpawnPoint;
     [SerializeField] GameObject ServerProjectilePrefab;
     [SerializeField] GameObject ClientProjectilePrefab;
+    [SerializeField] GameObject muzzleFlash;
+    [SerializeField] Collider playerCollider;
 
     [Header("Settings")]
     [SerializeField] float projectileSpeed;
+    [SerializeField] private float fireRate;
+    [SerializeField] float muzzleFlashDuration;
     private bool shouldFire;
+    private float previousFireTime;
+    private float muzzleFlashTimer;
     public override void OnNetworkSpawn()
     {
     
@@ -34,13 +41,29 @@ public class ProjectileLauncher : NetworkBehaviour
     // Update is called once per frame
     void Update()
     {
+        // all users wshould be able to see it
+        if (muzzleFlashTimer > 0f)
+        {
+            muzzleFlashTimer -= Time.deltaTime;
+            if (muzzleFlashTimer < 0f) {
+                muzzleFlash.SetActive(false);
+            }
+        }
         if (!IsOwner) { return; }
         
         if (!shouldFire) {return; }
 
+        // figure out when allowed to fire
+        if(Time.time < (1 / fireRate) + previousFireTime) { return; }
+
+        Vector3 fireDirection = ProjectileSpawnPoint.position;
+        fireDirection.y = 0f;
+        //fireDirection.Normalize();
         // make sure server rpc getting same data so everyone can see projectile
-        PrimaryFireServerRpc(ProjectileSpawnPoint.position, ProjectileSpawnPoint.up);
-        SpawnDummyProjectile(ProjectileSpawnPoint.position, ProjectileSpawnPoint.up);
+        PrimaryFireServerRpc(fireDirection, ProjectileSpawnPoint.forward);
+        SpawnDummyProjectile(fireDirection, ProjectileSpawnPoint.forward);
+
+        previousFireTime = Time.time; // overtime time.time will be less innacurate + overflow if server was on for years
     }
 
   
@@ -58,9 +81,17 @@ public class ProjectileLauncher : NetworkBehaviour
         GameObject projectileInstance = Instantiate(
             ServerProjectilePrefab,
             spawnPos,
-            Quaternion.identity);
+            Quaternion.LookRotation(direction));
 
         projectileInstance.transform.up = direction;
+
+        //preventing projectile from colliding with s
+        Physics.IgnoreCollision(playerCollider, projectileInstance.GetComponent<Collider>());
+
+        if (projectileInstance.TryGetComponent<Rigidbody>(out Rigidbody rb))
+        {
+            rb.velocity = direction.normalized * projectileSpeed;
+        }
 
         SpawnDummyProjectile(spawnPos, direction);
     }
@@ -75,17 +106,29 @@ public class ProjectileLauncher : NetworkBehaviour
     private void SpawnDummyProjectileClientRpc(Vector3 spawnPos, Vector3 direction)
     {
         if (IsOwner) { return; }
+        ////preventing projectile from colliding with player for dummy as well
         SpawnDummyProjectile(spawnPos, direction);
     }
     private void SpawnDummyProjectile(Vector3 spawnPos, Vector3 direction)
     {
+        // set muzzle flash since its part of visuals for projectile
+        muzzleFlash.SetActive(true);
+        muzzleFlashTimer = muzzleFlashDuration;
         // store object in variable
         GameObject projectileInstance = Instantiate(
             ClientProjectilePrefab,
             spawnPos,
-            Quaternion.identity);
+            Quaternion.LookRotation(direction));
 
         projectileInstance.transform.up = direction;
+
+        // should also ingore collision for dummy projectile
+        Physics.IgnoreCollision(playerCollider, projectileInstance.GetComponent<Collider>());
+
+        if(projectileInstance.TryGetComponent<Rigidbody>(out Rigidbody rb))
+        {
+            rb.velocity = direction.normalized * projectileSpeed;
+        }
     }
 
   
