@@ -88,12 +88,18 @@ public class ProjectileLauncher : NetworkBehaviour
         //preventing projectile from colliding with s
         Physics.IgnoreCollision(playerCollider, projectileInstance.GetComponent<Collider>());
 
+        if(projectileInstance.TryGetComponent<DealDamageOnContact>(out DealDamageOnContact dealDamage))
+        {
+            // whoever launcehd this projectile is the owner of it
+            dealDamage.SetOwner(OwnerClientId);
+        }
+
         if (projectileInstance.TryGetComponent<Rigidbody>(out Rigidbody rb))
         {
             rb.velocity = direction.normalized * projectileSpeed;
         }
 
-        SpawnDummyProjectile(spawnPos, direction);
+        SpawnDummyProjectileClientRpc(spawnPos, direction);
     }
 
 
