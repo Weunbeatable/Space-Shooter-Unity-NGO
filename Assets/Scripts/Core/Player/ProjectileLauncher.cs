@@ -56,12 +56,14 @@ public class ProjectileLauncher : NetworkBehaviour
         // figure out when allowed to fire
         if(Time.time < (1 / fireRate) + previousFireTime) { return; }
 
-        Vector3 fireDirection = ProjectileSpawnPoint.position;
+        Vector3 spawnPosition = ProjectileSpawnPoint.position;
+
+        Vector3 fireDirection = ProjectileSpawnPoint.forward;
         fireDirection.y = 0f;
-        //fireDirection.Normalize();
+        fireDirection.Normalize();
         // make sure server rpc getting same data so everyone can see projectile
-        PrimaryFireServerRpc(fireDirection, ProjectileSpawnPoint.forward);
-        SpawnDummyProjectile(fireDirection, ProjectileSpawnPoint.forward);
+        PrimaryFireServerRpc(spawnPosition, fireDirection);
+        SpawnDummyProjectile(spawnPosition, fireDirection);
 
         previousFireTime = Time.time; // overtime time.time will be less innacurate + overflow if server was on for years
     }
@@ -83,7 +85,7 @@ public class ProjectileLauncher : NetworkBehaviour
             spawnPos,
             Quaternion.LookRotation(direction));
 
-        projectileInstance.transform.up = direction;
+        
 
         //preventing projectile from colliding with s
         Physics.IgnoreCollision(playerCollider, projectileInstance.GetComponent<Collider>());
@@ -126,10 +128,14 @@ public class ProjectileLauncher : NetworkBehaviour
             spawnPos,
             Quaternion.LookRotation(direction));
 
-        projectileInstance.transform.up = direction;
+        
 
         // should also ingore collision for dummy projectile
         Physics.IgnoreCollision(playerCollider, projectileInstance.GetComponent<Collider>());
+
+                // in the event that the server and client projectile collides with itself it shouldn't destroy the players own projectile
+            Physics.IgnoreCollision(ServerProjectilePrefab.GetComponent<Collider>(), ClientProjectilePrefab.GetComponent<Collider>());
+        
 
         if(projectileInstance.TryGetComponent<Rigidbody>(out Rigidbody rb))
         {

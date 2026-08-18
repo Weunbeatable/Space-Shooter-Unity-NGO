@@ -24,11 +24,12 @@ public class DealDamageOnContact : MonoBehaviour
                 // if client we set locally is equal to the owner // means hit your own player. 
                 if(ownerClientID == netobj.OwnerClientId)
                 {
+                // if you hit yourself then don't do damage
                     return;
                 }
             }
 
-            if(other.TryGetComponent<Health>(out Health health));
+            if(other.attachedRigidbody.TryGetComponent<Health>(out Health health));
             {
                 health.TakeDamage(damage);
             }
