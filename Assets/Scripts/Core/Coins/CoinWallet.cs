@@ -1,18 +1,21 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Netcode;
 using UnityEngine;
 
-public class CoinWallet : MonoBehaviour
+public class CoinWallet : NetworkBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
+    public NetworkVariable<int> TotalCoins = new NetworkVariable<int>();
 
-    // Update is called once per frame
-    void Update()
+
+    private void OnTriggerEnter(Collider other)
     {
-        
+        if (!other.TryGetComponent<Coin>(out Coin coin)) { return; }
+
+        int storedCoinValue = coin.Collect();
+
+        if (!IsServer) { return; }
+
+        TotalCoins.Value += storedCoinValue;
     }
 }

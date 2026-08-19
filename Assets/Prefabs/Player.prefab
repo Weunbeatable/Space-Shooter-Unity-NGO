@@ -345,6 +345,7 @@ GameObject:
   - component: {fileID: 5379658166225888982}
   - component: {fileID: 7553932014015438739}
   - component: {fileID: 3105937173566829754}
+  - component: {fileID: 8486174707522401164}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -381,7 +382,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 649188617
+  GlobalObjectIdHash: 1916223285
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
   ActiveSceneSynchronization: 0
@@ -526,6 +527,20 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   <maxHealth>k__BackingField: 100
   currenthealth:
+    m_InternalValue: 0
+--- !u!114 &8486174707522401164
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5646939509000065095}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ce4ea4d8df5759b4ba9b4908fce313e6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  TotalCoins:
     m_InternalValue: 0
 --- !u!1 &8066466104801641261
 GameObject:

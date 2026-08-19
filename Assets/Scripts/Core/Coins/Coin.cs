@@ -11,7 +11,7 @@ public abstract class Coin : NetworkBehaviour
 
     [SerializeField] private MeshRenderer meshRenderer;
 
-    protected int coinValue;
+    protected int coinValue = 10;
     protected bool alreadyCollected; // in case 2 players walk over the same coin at the same time
 
     public abstract int Collect();

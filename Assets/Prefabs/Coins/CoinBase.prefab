@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 1694093501413672776}
   - component: {fileID: 2405785548497703222}
   - component: {fileID: 791563645959937756}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: CoinBase
   m_TagString: Untagged
   m_Icon: {fileID: 0}
