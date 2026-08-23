@@ -22,6 +22,12 @@ active you will be invulnerable for 3 seconds and a sitting duck for the remaini
 Stick drift: - You will move in the opposite direction of your controls for 5 seconds
 
 Overdrive, : - greatly reduce cooldown on your abilities and move faster for a period of time. 
+hghjhjkjlhjkhdaf
 
-delayed shots: - you can rapidly click the fire key, in this mode projectiles will spawn in, there will be a delay  before they fire off in their
-given direction, longer charge increases speed, size and velocity
+portals: - portals live onthe map, driving near them will trigger a special camera effect that will move your camera view so you can see the portal effect, going in 
+will trigger a screen wide shader, for other players they will hear a sound effect and maybe an effect on the minimap to indicate you've teleported and leaving the portal will have a camera effect also
+before resulting back to the default camera. There will be a few portals on the map as the map will be larger, may have color codes to make it easy to distinguish where you will end up. 
+portal will activate as well when you're in range and may have some slight pull if idle. Closer you get more intense effect will be ( will need to expose some vfx graph variables) 
+If you're not in the field of influence aka where the camera shifts and it pulls (have some rocks rotating around the area) portal effect is inactive. only shows when you're in range. Getting within range affects your speed as well. 
+
+possible upgrade healthbar wraps around ship or ship texture material changes based on damage so its easy to tell. 

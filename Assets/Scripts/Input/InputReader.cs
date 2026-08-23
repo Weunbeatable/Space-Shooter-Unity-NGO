@@ -10,6 +10,8 @@ using static Controls;
 public class InputReader : ScriptableObject, IPlayerActions
 {
     public event Action<bool> PrimaryFireEvent;
+    public event Action<bool> ChangeAltitudeEvent;
+    public event Action<bool> UseAbilityEvent;
     public event Action<Vector2> MoveEvent;
 
     public Vector2 AimPosition {  get; private set; }
@@ -53,5 +55,29 @@ public class InputReader : ScriptableObject, IPlayerActions
     private void OnDisable()
     {
         controls.Player.Disable();
+    }
+
+    public void OnChangeAltitude(InputAction.CallbackContext context)
+    {
+        if (context.performed)
+        {
+            ChangeAltitudeEvent?.Invoke(true);
+        }
+      /*  else if (context.canceled)
+        {
+            ChangeAltitudeEvent?.Invoke(false);
+        }*/
+    }
+
+    public void OnUseAbility(InputAction.CallbackContext context)
+    {
+        if (context.performed)
+        {
+            UseAbilityEvent?.Invoke(true);
+        }
+        else if (context.canceled)
+        {
+            UseAbilityEvent?.Invoke(false);
+        }
     }
 }

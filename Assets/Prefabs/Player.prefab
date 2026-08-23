@@ -382,7 +382,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 1916223285
+  GlobalObjectIdHash: 649188617
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
   ActiveSceneSynchronization: 0
@@ -435,8 +435,13 @@ MonoBehaviour:
   inputReader: {fileID: 11400000, guid: 2b0ed51268b2b1f46af1702daa4f5fef, type: 2}
   bodyTransform: {fileID: 1679879308936963058}
   playerBody: {fileID: 6364529844426862324}
-  movementSpeed: 8
+  movementSpeed: 16
   turningRate: 270
+  didAltitudeChange: 0
+  altitudePositions:
+  - 1
+  - -30
+  altitudespeedChangeRate: 0.15
 --- !u!54 &6364529844426862324
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -510,7 +515,7 @@ MonoBehaviour:
     type: 3}
   muzzleFlash: {fileID: 8066466104801641261}
   playerCollider: {fileID: 3150327495100815513}
-  projectileSpeed: 30
+  projectileSpeed: 50
   fireRate: 0.8
   muzzleFlashDuration: 0.075
 --- !u!114 &3105937173566829754
@@ -640,15 +645,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: f24986c5005449f4e96046f5edb103a7, type: 3}
       propertyPath: m_LocalScale.x
-      value: 1
+      value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: f24986c5005449f4e96046f5edb103a7, type: 3}
       propertyPath: m_LocalScale.y
-      value: 1
+      value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: f24986c5005449f4e96046f5edb103a7, type: 3}
       propertyPath: m_LocalScale.z
-      value: 1
+      value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: f24986c5005449f4e96046f5edb103a7, type: 3}
       propertyPath: m_LocalPosition.x

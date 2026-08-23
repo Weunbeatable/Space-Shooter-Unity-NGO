@@ -56,7 +56,7 @@ public class CoinSpawner : NetworkBehaviour
         coin.Reset();
     }
 
-    private Vector2 GetSpawnPoint()
+    private Vector3 GetSpawnPoint()
     {
         // if its safe to spawn spawn it if not then don't, could cause problems if there wasn't a spawn pos bit it should be fine
         // will probably need to modify these values better for 3D also y may need to be only 1 of 2 values due to how movement is locked.
@@ -68,8 +68,8 @@ public class CoinSpawner : NetworkBehaviour
         while (true)
         {
             x = Random.Range(xSpawnRange.x, xSpawnRange.z);
-            y = Random.Range(ySpawnRange.y, ySpawnRange.z);
-            z = Random.Range(zSpawnRange.z, zSpawnRange.x);
+            y = Random.Range(ySpawnRange.x, ySpawnRange.z);
+            z = Random.Range(zSpawnRange.x, zSpawnRange.z);
             Vector3 spawnPoint = new Vector3 (x, y, z);
 
             // this math may be a bit off. also using var is a little slow 
