@@ -24,15 +24,17 @@ public class ApplicationController : MonoBehaviour
         }
         else
         {
-            // spawn in client singleton or host singleton if not a dedicated controller 
-            ClientSingleton clientSingleton = Instantiate(clientPrefab);
-            bool authenticated = await clientSingleton.CreateClient(); // any code after this line will have to wait for the createclient method to finish first 
             // wait for authentication before going ot main menu
             // Go to main menu
 
             HostSingleton hostSingleton = Instantiate(hostPrefab);
 
             hostSingleton.CreateHost();
+
+            // spawn in client singleton or host singleton if not a dedicated controller 
+            ClientSingleton clientSingleton = Instantiate(clientPrefab);
+            bool authenticated = await clientSingleton.CreateClient(); // any code after this line will have to wait for the createclient method to finish first 
+           
 
             // if create client was successful 
             // route to main menu 
