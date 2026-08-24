@@ -7,7 +7,7 @@ public class ClientSingleton : MonoBehaviour
 {
     private static ClientSingleton instance;
 
-    private ClientGameManager gameManager;
+    public ClientGameManager GameManager {  get; private set; }
 
     public static ClientSingleton Instance
     {
@@ -29,12 +29,12 @@ public class ClientSingleton : MonoBehaviour
         DontDestroyOnLoad(gameObject); // exist even when scenes change
     }
 
-    public async Task CreateClient()
+    public async Task<bool> CreateClient()
     {
-        gameManager = new ClientGameManager();
+        GameManager = new ClientGameManager();
 
         // without awaiting code after this method wont wait for it to finish. Needed so authentication happens before anything else
-        await gameManager.InitiAsync();
+        return await GameManager.InitiAsync();
     }
 
 }

@@ -26,14 +26,22 @@ public class ApplicationController : MonoBehaviour
         {
             // spawn in client singleton or host singleton if not a dedicated controller 
             ClientSingleton clientSingleton = Instantiate(clientPrefab);
-
-            await clientSingleton.CreateClient(); // any code after this line will have to wait for the createclient method to finish first 
+            bool authenticated = await clientSingleton.CreateClient(); // any code after this line will have to wait for the createclient method to finish first 
             // wait for authentication before going ot main menu
             // Go to main menu
 
             HostSingleton hostSingleton = Instantiate(hostPrefab);
 
             hostSingleton.CreateHost();
+
+            // if create client was successful 
+            // route to main menu 
+            if (authenticated)
+            {
+                // if it fails have them try again otherwise chage scene
+                clientSingleton.GameManager.GoToMenu();
+
+            }
         }
     }
 }
