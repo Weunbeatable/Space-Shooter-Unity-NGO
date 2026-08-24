@@ -9,18 +9,23 @@ public class ProjectileLauncher : NetworkBehaviour
 {
     [Header("References")]
     [SerializeField] InputReader inputReader;
+    [SerializeField] CoinWallet wallet;
     [SerializeField] Transform ProjectileSpawnPoint;
     [SerializeField] GameObject ServerProjectilePrefab;
     [SerializeField] GameObject ClientProjectilePrefab;
     [SerializeField] GameObject muzzleFlash;
     [SerializeField] Collider playerCollider;
+    
 
     [Header("Settings")]
     [SerializeField] float projectileSpeed;
     [SerializeField] private float fireRate;
     [SerializeField] float muzzleFlashDuration;
+    [SerializeField] private int costToFire; // if we have enough coins fire. 
+    [SerializeField] AudioSource projectileAudioSource;
+    [SerializeField] AudioClip projectileAudioClip;
     private bool shouldFire;
-    private float previousFireTime;
+    private float timer;
     private float muzzleFlashTimer;
     public override void OnNetworkSpawn()
     {
@@ -50,11 +55,17 @@ public class ProjectileLauncher : NetworkBehaviour
             }
         }
         if (!IsOwner) { return; }
-        
+        if (timer > 0f)
+        {
+            timer -= Time.deltaTime;
+        }
         if (!shouldFire) {return; }
 
         // figure out when allowed to fire
-        if(Time.time < (1 / fireRate) + previousFireTime) { return; }
+        if(timer > 0) { return; }
+
+        // enough to fire
+        if(wallet.TotalCoins.Value < costToFire) { return; }
 
         Vector3 spawnPosition = ProjectileSpawnPoint.position;
 
@@ -65,7 +76,7 @@ public class ProjectileLauncher : NetworkBehaviour
         PrimaryFireServerRpc(spawnPosition, fireDirection);
         SpawnDummyProjectile(spawnPosition, fireDirection);
 
-        previousFireTime = Time.time; // overtime time.time will be less innacurate + overflow if server was on for years
+        timer = 1 / fireRate;
     }
 
   
@@ -79,6 +90,9 @@ public class ProjectileLauncher : NetworkBehaviour
     [ServerRpc]
     private void PrimaryFireServerRpc(Vector3 spawnPos, Vector3 direction)
     {
+        if (wallet.TotalCoins.Value < costToFire) { return; }
+
+        wallet.SpendCoins(costToFire);
         // trusting that client is firing
         GameObject projectileInstance = Instantiate(
             ServerProjectilePrefab,
@@ -100,7 +114,7 @@ public class ProjectileLauncher : NetworkBehaviour
         {
             rb.velocity = direction.normalized * projectileSpeed;
         }
-
+        SpawnAudioClip();
         SpawnDummyProjectileClientRpc(spawnPos, direction);
     }
 
@@ -116,6 +130,11 @@ public class ProjectileLauncher : NetworkBehaviour
         if (IsOwner) { return; }
         ////preventing projectile from colliding with player for dummy as well
         SpawnDummyProjectile(spawnPos, direction);
+    }
+
+    private void SpawnAudioClip()
+    {
+        projectileAudioSource.PlayOneShot(projectileAudioClip);
     }
     private void SpawnDummyProjectile(Vector3 spawnPos, Vector3 direction)
     {
