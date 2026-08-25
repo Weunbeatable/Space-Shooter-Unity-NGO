@@ -13,15 +13,19 @@ public class PlayerAiming : NetworkBehaviour
 
     private Camera mainCamera;
 
-    private void Awake()
-    {
-        mainCamera = Camera.main;
-    }
-
+   
     private void LateUpdate()
     {
         if (!IsOwner)
             return;
+
+        // ensure right camera is grabbed
+        if(mainCamera == null)
+        {
+            mainCamera = Camera.main;
+
+            if (mainCamera == null) return;
+        }
 
         Vector2 mousePosition = inputReader.AimPosition;
 

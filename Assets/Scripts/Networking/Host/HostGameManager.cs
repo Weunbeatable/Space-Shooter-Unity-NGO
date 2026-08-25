@@ -14,7 +14,7 @@ using UnityEngine.SceneManagement;
 using System.Text;
 using Unity.Services.Authentication;
 
-public class HostGameManager : MonoBehaviour
+public class HostGameManager : IDisposable
 {
     private Allocation allocation;
     private string joinCode;
@@ -122,6 +122,25 @@ public class HostGameManager : MonoBehaviour
             Lobbies.Instance.SendHeartbeatPingAsync(lobbyId);
             yield return delay; // wait 15 seconds and make ping 
         }
+    }
+    public async void Dispose()
+    {
+       HostSingleton.Instance.StopCoroutine(nameof(HeartbeatLobby));
+
+        if (!string.IsNullOrEmpty(lobbyId))
+        {
+            try
+            {
+                await Lobbies.Instance.DeleteLobbyAsync(lobbyId);
+            }
+            catch (LobbyServiceException ex)
+            {
+                Debug.LogException(ex);
+            }
+            lobbyId = string.Empty; // if some reason its called twice it wont try to delete it twice
+        }
+        networkServer?.Dispose();
+        
     }
 }
 /*lobby logic create allocation and create join code for it
