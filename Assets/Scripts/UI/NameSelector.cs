@@ -12,7 +12,7 @@ public class NameSelector : MonoBehaviour
     [SerializeField] private int minNameLength = 1;
     [SerializeField] private int maxNameLength = 12; // same check for length should be done on server side as well as client
 
-    private const string playerNameKey = "playerName";
+    public const string playerNameKey = "playerName";
     void Start()
     {
         // let dedicated servers skip this scene

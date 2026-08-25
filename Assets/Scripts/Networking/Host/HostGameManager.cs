@@ -11,6 +11,7 @@ using Unity.Services.Relay.Models;
 using Unity.Services.Lobbies.Models;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using System.Text;
 
 public class HostGameManager : MonoBehaviour
 {
@@ -19,6 +20,8 @@ public class HostGameManager : MonoBehaviour
     private const string GameSceneName = "Game";
     private const int MaxConnections = 20;
     private string lobbyId;
+
+    private NetworkServer networkServer;
     //method to start as host which can be called through UI
     public async Task StartHostAsync()
     {
@@ -72,8 +75,10 @@ public class HostGameManager : MonoBehaviour
             };
             // need to send a ping to the lobby every few seconds to indicate that the lobby still exists and is active (heartbeat)
             // create the lobby
+            string playerName = PlayerPrefs.GetString(NameSelector.playerNameKey, "Unknown"); // when making lobby grab name from player
+            //prefs before making lobby
            Lobby lobby =  await Lobbies.Instance.CreateLobbyAsync(
-               "My Lobby", MaxConnections, lobbyOptions);
+                $"{playerName}'s My Lobby", MaxConnections, lobbyOptions);
             lobbyId = lobby.Id;
 
             HostSingleton.Instance.StartCoroutine(HeartbeatLobby(15));
@@ -83,6 +88,21 @@ public class HostGameManager : MonoBehaviour
             Debug.Log(e);
             return;
         }
+
+        // before starting host create network server, due to its creation it will hook up to connection approval callback and start
+        // approving requests on connection
+        networkServer = new NetworkServer(NetworkManager.Singleton);
+
+        //set data before starting the client
+        UserData userData = new UserData()
+        {
+            userName = PlayerPrefs.GetString(NameSelector.playerNameKey, "Missing Name") // if somehow didn't get a name put missing name
+        };
+        // reverse json conversion method converting to Json not from
+        string payload = JsonUtility.ToJson(userData);
+        byte[] payloadBytes = Encoding.UTF8.GetBytes(payload);
+
+        NetworkManager.Singleton.NetworkConfig.ConnectionData = payloadBytes; // sent when connected to server 
 
         // tell it to start hosting
         NetworkManager.Singleton.StartHost();
