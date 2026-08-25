@@ -12,6 +12,7 @@ using Unity.Services.Lobbies.Models;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using System.Text;
+using Unity.Services.Authentication;
 
 public class HostGameManager : MonoBehaviour
 {
@@ -96,7 +97,8 @@ public class HostGameManager : MonoBehaviour
         //set data before starting the client
         UserData userData = new UserData()
         {
-            userName = PlayerPrefs.GetString(NameSelector.playerNameKey, "Missing Name") // if somehow didn't get a name put missing name
+            userName = PlayerPrefs.GetString(NameSelector.playerNameKey, "Missing Name"), // if somehow didn't get a name put missing name
+             userAuthID = AuthenticationService.Instance.PlayerId
         };
         // reverse json conversion method converting to Json not from
         string payload = JsonUtility.ToJson(userData);

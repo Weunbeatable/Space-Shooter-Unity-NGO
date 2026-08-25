@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
 using Unity.Networking.Transport.Relay;
+using Unity.Services.Authentication;
 using Unity.Services.Core;
 using Unity.Services.Relay;
 using Unity.Services.Relay.Models;
@@ -16,12 +17,17 @@ public class ClientGameManager
 {
     private const string MenuSceneName = "Menu";
     private JoinAllocation allocation;
+    private NetworkClient networkClient;
     // lasts an unkown amount of time can be there till task is done
     public async Task<bool> InitiAsync() // to know if whoever initalized this function was successful turn it into a bool task
     {
         // authenticate player
         // init unity services
         await UnityServices.InitializeAsync();
+
+        // when starting connecting as a client, it creates the network client.cs which then listens for disconnects, which then
+        // ensures a proper disconnect and reroute to the right scene to avoid having to open and close the game every time
+        networkClient = new NetworkClient(NetworkManager.Singleton); 
 
         AuthState authState = await AuthenticationWrapper.DoAuth();
 
@@ -61,7 +67,8 @@ public class ClientGameManager
         //set data before starting the client
         UserData userData = new UserData()
         {
-            userName = PlayerPrefs.GetString(NameSelector.playerNameKey, "Missing Name") // if somehow didn't get a name put missing name
+            userName = PlayerPrefs.GetString(NameSelector.playerNameKey, "Missing Name"), // if somehow didn't get a name put missing name
+            userAuthID = AuthenticationService.Instance.PlayerId // will allow us to know who player is
         };
         // reverse json conversion method converting to Json not from
         string payload = JsonUtility.ToJson(userData);

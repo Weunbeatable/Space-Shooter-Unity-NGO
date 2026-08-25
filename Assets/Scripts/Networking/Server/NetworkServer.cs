@@ -7,13 +7,24 @@ using UnityEngine;
 public class NetworkServer 
 {
     private NetworkManager networkManager;
+
+    private Dictionary<ulong, string> clientIDToAuth = new Dictionary<ulong, string>();
+    private Dictionary<string, UserData> authIdToUserData = new Dictionary<string, UserData>();
+
+   
+
    public NetworkServer(NetworkManager networkManager)
     {
         this.networkManager = networkManager; // caching network manager when it comes in 
 
+        
         // using connectino approval
         networkManager.ConnectionApprovalCallback += ApprovalCheck; // triggered when anyone connects to server and give us info about that ocnnection
+        // handle disconnection to remove user data when they leave list
+        networkManager.OnServerStarted += OnNetworkReady;
     }
+
+
 
     private void ApprovalCheck(
         NetworkManager.ConnectionApprovalRequest request,
@@ -26,9 +37,29 @@ public class NetworkServer
         string payload = System.Text.Encoding.UTF8.GetString(request.Payload); // store string payload, contains object with name and other info gets bye array converted to json string
         UserData userData = JsonUtility.FromJson<UserData>(payload); // convert with from Json string to usable data
 
-        Debug.Log(userData.userName);
+        // this payload is temporary, needs to be stored somewhere
+        // when authenticated on client side need to know who they are. 
+        // to ways to identify player, info user data passed in and client network id
+        clientIDToAuth[request.ClientNetworkId] = userData.userAuthID; // store id along with user data
+        authIdToUserData[userData.userAuthID] = userData;
 
         response.Approved = true; // lets users finish connection to server. 
         response.CreatePlayerObject = true;
+    }
+
+    private void OnNetworkReady()
+    {
+        // called once approval done, when server is ready to go
+        networkManager.OnClientDisconnectCallback += OnClientDisconnect;
+    }
+
+    private void OnClientDisconnect(ulong clientId)
+    {
+        if(clientIDToAuth.TryGetValue(clientId, out string authId))
+        {
+            clientIDToAuth.Remove(clientId); // data removed from dictionary
+
+            authIdToUserData.Remove(authId); // removal from second dictionary
+        }
     }
 }
