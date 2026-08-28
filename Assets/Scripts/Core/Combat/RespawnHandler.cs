@@ -12,7 +12,7 @@ public class RespawnHandler : NetworkBehaviour
         // as soon as respawn handler starts to exist (when arriving at gameplay scene) 
         if (!IsServer) { return; }
         // Situations where player goes before scene (like self hosting) 
-        ShipPlayer[] players = FindObjectsByType<ShipPlayer>(FindObjectsInactive.Exclude, FindObjectsSortMode.None);
+        ShipPlayer[] players = FindObjectsByType<ShipPlayer>(FindObjectsSortMode.None);
         foreach (ShipPlayer player in players)
         {
            HandlePlayerSpawned(player);
