@@ -637,6 +637,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   cinemachineVirtualCamera: {fileID: 8269098769306444791}
   ownerPriority: 15
+  <Health>k__BackingField: {fileID: 3105937173566829754}
   PlayerName:
     m_InternalValue:
       utf8LengthInBytes: 0
@@ -767,6 +768,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   screenspaceMat: {fileID: 2100000, guid: 7841f11dc66166d4091722a1acf4005d, type: 2}
+  criticalHealthValue: 30
   rendererData: {fileID: 11400000, guid: c40be3174f62c4acf8c1216858c64956, type: 2}
 --- !u!1 &6817553470951507852
 GameObject:
