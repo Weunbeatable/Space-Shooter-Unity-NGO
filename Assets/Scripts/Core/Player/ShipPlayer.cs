@@ -16,6 +16,7 @@ public class ShipPlayer : NetworkBehaviour
     [Header("Settings")]
     [SerializeField] private int ownerPriority = 15;
     [field: SerializeField] public Health Health { get; set; } // field will leave it exposed in editor without open to modification
+    [field: SerializeField] public CoinWallet Wallet { get; set; } // field will leave it exposed in editor without open to modification
     // network variable that will sync over the network
     public NetworkVariable<FixedString32Bytes> PlayerName = new NetworkVariable<FixedString32Bytes>();
 

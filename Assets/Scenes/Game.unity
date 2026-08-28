@@ -11863,11 +11863,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   coinPrefab: {fileID: 5262576137317116168, guid: b1462c129f9a92047834bfdd116b25e3,
     type: 3}
-  maxCoins: 50
+  maxCoins: 250
   coinValue: 10
-  xSpawnRange: {x: -400, y: 0, z: 400}
+  xSpawnRange: {x: -820, y: 0, z: 820}
   ySpawnRange: {x: 0, y: 0, z: 0}
-  zSpawnRange: {x: -50, y: 0, z: 450}
+  zSpawnRange: {x: -500, y: 0, z: 500}
   layerMask:
     serializedVersion: 2
     m_Bits: 1

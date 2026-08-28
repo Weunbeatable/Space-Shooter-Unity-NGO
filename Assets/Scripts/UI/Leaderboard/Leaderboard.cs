@@ -4,6 +4,7 @@ using UnityEngine;
 using Unity.Netcode;
 using Assets.Scripts.UI.Leaderboard;
 using System;
+using System.Linq;
 public class Leaderboard : NetworkBehaviour
 {
     [SerializeField] private Transform leaderboardEntityHolder;
@@ -11,6 +12,9 @@ public class Leaderboard : NetworkBehaviour
 
     // will need to pass a custom type into here to be able to pass objects with things like coins leaderboards tc
     private NetworkList<LeaderboardEntityState> leaderboardEntities;
+
+    // store entities spawned in a list
+    private List<LeaderboardEntityDisplay> entityDisplays = new List<LeaderboardEntityDisplay>(); // not a network so initalizable here
 
     private void Awake()
     {
@@ -43,7 +47,7 @@ public class Leaderboard : NetworkBehaviour
         }
 
         ShipPlayer.OnPlayerSpawned += HandlePlayerSpawned;
-        ShipPlayer.OnPlayerSpawned += HandlePlayerDespawned;
+        ShipPlayer.OnPlayerDespawned += HandlePlayerDespawned;
         }
     }
 
@@ -58,7 +62,7 @@ public class Leaderboard : NetworkBehaviour
         if (IsServer)
         {
             ShipPlayer.OnPlayerSpawned -= HandlePlayerSpawned;
-            ShipPlayer.OnPlayerSpawned -= HandlePlayerDespawned;
+            ShipPlayer.OnPlayerDespawned -= HandlePlayerDespawned;
         }
     }
 
@@ -70,10 +74,41 @@ public class Leaderboard : NetworkBehaviour
         switch (changeEvent.Type)
         {
             case NetworkListEvent<LeaderboardEntityState>.EventType.Add:
-                // when added to list spawn in ui entry when added to leaderboard
-                Instantiate(leaderboardEntityDisplay, leaderboardEntityHolder); // need to move to list to handle specific instance
+                // lambda expression to check for any entity displays where client id == change event client id
+                // spawn new one (empty displays) if there aren't any displays that match clientId
+                if(!entityDisplays.Any(x => x.ClientId == changeEvent.Value.ClientId))
+                {
+                    // when added to list spawn in ui entry when added to leaderboard
+                    // add entity to list
+                   LeaderboardEntityDisplay leaderboardEntity = Instantiate(
+                       leaderboardEntityDisplay, leaderboardEntityHolder); // need to move to list to handle specific instance
+                    leaderboardEntity.Initalise(
+                        changeEvent.Value.ClientId,
+                        changeEvent.Value.playerName,
+                        changeEvent.Value.Coins);
+                    entityDisplays.Add(leaderboardEntity); // when a new one is spawned in and the display check is done, wont make duplicate displays
+                }
+            
                 break;
             case NetworkListEvent<LeaderboardEntityState>.EventType.Remove:
+                 LeaderboardEntityDisplay displayToRemove =
+                    entityDisplays.FirstOrDefault(x => x.ClientId == changeEvent.Value.ClientId); // find first occurence null if none
+                if (displayToRemove != null)
+                {
+                    // set parent to null before destroying
+                    displayToRemove.transform.SetParent(null);
+                    Destroy(displayToRemove.gameObject);
+                    entityDisplays.Remove(displayToRemove);
+                }
+
+                break;
+            case NetworkListEvent<LeaderboardEntityState>.EventType.Value:
+                LeaderboardEntityDisplay displayToUpdate =
+                    entityDisplays.FirstOrDefault(x => x.ClientId == changeEvent.Value.ClientId);
+                if (displayToUpdate != null)
+                {
+                    displayToUpdate.UpdateCoins(changeEvent.Value.Coins);
+                }
                 break;
         }
     }
@@ -87,6 +122,8 @@ public class Leaderboard : NetworkBehaviour
             playerName  = player.PlayerName.Value,
             Coins = 0 // value they start off with 
         });
+        player.Wallet.TotalCoins.OnValueChanged += (oldCoins, newCoins) =>
+            HandleCoinsChanged(player.OwnerClientId, newCoins);
     }
 
     private void HandlePlayerDespawned(ShipPlayer player)
@@ -101,6 +138,24 @@ public class Leaderboard : NetworkBehaviour
             leaderboardEntities.Remove(entity);
         
             break;
+        }
+        player.Wallet.TotalCoins.OnValueChanged -= (oldCoins, newCoins) =>
+            HandleCoinsChanged(player.OwnerClientId, newCoins);
+    }
+    private void HandleCoinsChanged(ulong clientId, int newCoins)
+    {
+        // go through entity states synced to client find matching player state and update coin value, then update all
+        // client leaderboard values
+        for (int i = 0; i < leaderboardEntities.Count; i++)
+        {
+            if (leaderboardEntities[i].ClientId != clientId) { continue; }
+            leaderboardEntities[i] = new LeaderboardEntityState
+            {
+                ClientId = leaderboardEntities[i].ClientId,
+                playerName = leaderboardEntities[i].playerName,
+                Coins = newCoins
+            };
+              
         }
     }
 }
