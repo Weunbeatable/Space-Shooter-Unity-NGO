@@ -22,7 +22,7 @@ public class HostGameManager : IDisposable
     private const int MaxConnections = 20;
     private string lobbyId;
 
-    private NetworkServer networkServer;
+    public NetworkServer networkServer { get; private set; }
     //method to start as host which can be called through UI
     public async Task StartHostAsync()
     {

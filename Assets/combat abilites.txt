@@ -31,3 +31,5 @@ portal will activate as well when you're in range and may have some slight pull 
 If you're not in the field of influence aka where the camera shifts and it pulls (have some rocks rotating around the area) portal effect is inactive. only shows when you're in range. Getting within range affects your speed as well. 
 
 possible upgrade healthbar wraps around ship or ship texture material changes based on damage so its easy to tell. 
+
+Multiple ship types to choose from with different stats. (maybe a stats bar to show balance like in mario kart) like in mario kart.

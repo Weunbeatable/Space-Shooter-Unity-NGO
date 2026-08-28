@@ -44,6 +44,8 @@ public class NetworkServer : IDisposable
         authIdToUserData[userData.userAuthID] = userData;
 
         response.Approved = true; // lets users finish connection to server. 
+        response.Position = SpawnPoints.GetRandomSpawnPos();
+        response.Rotation = Quaternion.identity;
         response.CreatePlayerObject = true;
     }
 
@@ -77,5 +79,18 @@ public class NetworkServer : IDisposable
                 networkManager.Shutdown();
             }
         }
+    }
+
+    public UserData GetUserDataByClientId(ulong clidentId)
+    {
+        if(clientIDToAuth.TryGetValue(clidentId, out string authId))
+        {
+            if(authIdToUserData.TryGetValue(authId, out  UserData data))
+            {
+                return data;
+            }
+            return null;
+        }
+        return null;
     }
 }
