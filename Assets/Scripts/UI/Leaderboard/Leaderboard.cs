@@ -9,7 +9,8 @@ public class Leaderboard : NetworkBehaviour
 {
     [SerializeField] private Transform leaderboardEntityHolder;
     [SerializeField] private LeaderboardEntityDisplay leaderboardEntityDisplay;
-
+    // int to specify how many entities can be seen at once, if there are more than max it will just show players ranking even if not in top set
+    [SerializeField] private int entitiesToDisplay = 8;
     // will need to pass a custom type into here to be able to pass objects with things like coins leaderboards tc
     private NetworkList<LeaderboardEntityState> leaderboardEntities;
 
@@ -110,6 +111,35 @@ public class Leaderboard : NetworkBehaviour
                     displayToUpdate.UpdateCoins(changeEvent.Value.Coins);
                 }
                 break;
+        }
+
+        // lambda expression to sort so larger coins at top of leaderboard and smaller coin coints below
+        // largest to smallest
+        entityDisplays.Sort((x, y) => y.Coins.CompareTo(x.Coins));
+
+        // update UI for same order
+        for (int i = 0; i < entityDisplays.Count; i++)
+        {
+            entityDisplays[i].transform.SetSiblingIndex(i);
+            entityDisplays[i].UpdateText();
+            bool shouldShow = i <= entitiesToDisplay - 1; // max entities  - 1 since array starts at 0
+            entityDisplays[i].gameObject.SetActive(i <= entitiesToDisplay - 1);
+        }
+        // if the player has a low score and doesn't reach leaderboard. just show them at the bottom
+        // of the leaderboard. remove last person and put  username in that place 
+        LeaderboardEntityDisplay myDisplay =
+            entityDisplays.FirstOrDefault(x => x.ClientId == NetworkManager.Singleton.LocalClientId);
+
+        // ensure usally exists
+        if (myDisplay != null)
+        {
+            // if current position is past leaderboard, hide the person in the last leaderbord position and replace them
+            // with the user. 
+            if (myDisplay.transform.GetSiblingIndex() >= entitiesToDisplay)
+            {
+                leaderboardEntityHolder.GetChild(entitiesToDisplay -1).gameObject.SetActive(false);
+                myDisplay.gameObject.SetActive(true);
+            }
         }
     }
 

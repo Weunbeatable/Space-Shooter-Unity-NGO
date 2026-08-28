@@ -5,7 +5,8 @@ using Unity.Netcode;
 using System;
 public class RespawnHandler : NetworkBehaviour
 {
-    [SerializeField] private NetworkObject playerPrefab;
+    [SerializeField] private ShipPlayer playerPrefab;
+    [SerializeField] private float keptCoinPercentage;
 
     public override void OnNetworkSpawn()
     {
@@ -43,22 +44,25 @@ public class RespawnHandler : NetworkBehaviour
   
     private void HandlePlayerDie(ShipPlayer player)
     {
+        int keptCoins = (int) (player.Wallet.TotalCoins.Value * (keptCoinPercentage / 100));
         Destroy(player.gameObject);
 
         // wait till next frame before spawning player again 
-        StartCoroutine(RespawnPlayer(player.OwnerClientId));
+        StartCoroutine(RespawnPlayer(player.OwnerClientId, keptCoins));
     }
 
-    private IEnumerator RespawnPlayer(ulong ownerClientId)
+    private IEnumerator RespawnPlayer(ulong ownerClientId, int keptCoins)
     {
 
         yield return null;
 
-      NetworkObject playerInstance = 
+      ShipPlayer playerInstance = 
             Instantiate(playerPrefab, SpawnPoints.GetRandomSpawnPos(), Quaternion.identity);
 
         // assign newly spawned object to the owner client id so the new ship belowngs to player 
-        playerInstance.SpawnAsPlayerObject(ownerClientId);
+        // order for coin update matters dont want to modify coins value before spawned in as network object
+        playerInstance.Wallet.TotalCoins.Value += (int)keptCoins;
+        playerInstance.NetworkObject. SpawnAsPlayerObject(ownerClientId);
     }
 
    
