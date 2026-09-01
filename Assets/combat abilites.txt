@@ -37,3 +37,7 @@ USE BRECHMAN LINE ALGORITHM AND OTHER UDEMY COURSE FOR PROCEDURAL GENERATION TO 
 GREAT LEARNING OPPORTUNITY 
 
 Different ships can have unique traits e.g. better shield attunement, bonus bombs or lasers etc. 
+
+moving healing zone
+
+add chat system. I think everything is there from the leaderboard stuff

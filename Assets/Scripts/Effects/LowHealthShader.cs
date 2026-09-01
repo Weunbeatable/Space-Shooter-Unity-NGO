@@ -51,22 +51,19 @@ public class LowHealthShader : NetworkBehaviour
     void Update()
     {
 
-        var targetmat = rendererData.rendererFeatures.OfType<FullScreenPassRendererFeature>().FirstOrDefault();
-        if (!IsOwner) { return; }
-            if (this.gameObject.TryGetComponent(out Health health))
-            {
-                if (health.currenthealth.Value <= criticalHealthValue)
-                {
-                    // health is critical. 
-                    // TODO alter the shader depending on health value over time. 
+        if (!IsOwner || !isInitalized)
+            return;
 
-                    targetmat.passMaterial = screenspaceMat;
-                }
-                else
-                {
-                    targetmat.passMaterial = null;
-                }
+        if (this.gameObject.TryGetComponent(out Health health))
+        {
+            if (health.currenthealth.Value <= criticalHealthValue)
+            {
+                bool isLowHealth =
+            health.currenthealth.Value <= criticalHealthValue;
+                passRendererFeature.SetActive(isLowHealth);
             }
+        }
+       
     }
 
     public override void OnNetworkDespawn()

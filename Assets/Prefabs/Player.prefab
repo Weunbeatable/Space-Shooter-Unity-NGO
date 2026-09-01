@@ -536,7 +536,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 1916223285
+  GlobalObjectIdHash: 649188617
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
   ActiveSceneSynchronization: 0
@@ -589,7 +589,7 @@ MonoBehaviour:
   inputReader: {fileID: 11400000, guid: 2b0ed51268b2b1f46af1702daa4f5fef, type: 2}
   bodyTransform: {fileID: 1679879308936963058}
   playerBody: {fileID: 6364529844426862324}
-  movementSpeed: 20
+  movementSpeed: 45
   turningRate: 270
   didAltitudeChange: 0
   altitudePositions:
@@ -754,6 +754,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ce4ea4d8df5759b4ba9b4908fce313e6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  health: {fileID: 3105937173566829754}
+  coinPrefab: {fileID: 3797842731523939431, guid: 296b46b5969c796468fb5486a576cd7b,
+    type: 3}
+  coinSpread: 10
+  bountyPercentage: 50
+  bountyCoinCount: 10
+  minBountyCoinValue: 5
+  layerMask:
+    serializedVersion: 2
+    m_Bits: 1
   TotalCoins:
     m_InternalValue: 0
 --- !u!114 &3600889908296324244
