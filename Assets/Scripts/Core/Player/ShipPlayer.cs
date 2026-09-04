@@ -12,9 +12,11 @@ public class ShipPlayer : NetworkBehaviour
     // can use scriptable objects to hold settings that should be used. 
     [Header("References")]
     [SerializeField] CinemachineVirtualCamera cinemachineVirtualCamera;
+    [SerializeField] private SpriteRenderer minimapIconRenderer;
 
     [Header("Settings")]
     [SerializeField] private int ownerPriority = 15;
+    [SerializeField] private Color ownerColor;
     [field: SerializeField] public Health Health { get; set; } // field will leave it exposed in editor without open to modification
     [field: SerializeField] public CoinWallet Wallet { get; set; } // field will leave it exposed in editor without open to modification
     // network variable that will sync over the network
@@ -40,7 +42,9 @@ public class ShipPlayer : NetworkBehaviour
         {
             // everyone has the same priority till spawned on network, but your own player will get higher priority 15
             // when spawned on network 
-            cinemachineVirtualCamera.Priority = ownerPriority; 
+            cinemachineVirtualCamera.Priority = ownerPriority;
+
+            minimapIconRenderer.color = ownerColor;
         }
     }
 

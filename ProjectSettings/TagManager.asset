@@ -13,8 +13,8 @@ TagManager:
   - UI
   - Projectiles
   - Pickup
-  - 
-  - 
+  - Minimap
+  - Sun
   - 
   - 
   - 
@@ -46,4 +46,7 @@ TagManager:
     locked: 0
   - name: Player
     uniqueID: 1000161179
+    locked: 0
+  - name: Minimap
+    uniqueID: 2147417653
     locked: 0
