@@ -108,6 +108,9 @@ public class HostGameManager : IDisposable
 
         // tell it to start hosting
         NetworkManager.Singleton.StartHost();
+
+        networkServer.OnClientLeft += HandleClient;
+
         // change scene to go to gamepay scene.  call it based on scene name
         NetworkManager.Singleton.SceneManager.LoadScene(GameSceneName, LoadSceneMode.Single);
     }
@@ -123,9 +126,18 @@ public class HostGameManager : IDisposable
             yield return delay; // wait 15 seconds and make ping 
         }
     }
-    public async void Dispose()
+    public void Dispose()
     {
-       HostSingleton.Instance.StopCoroutine(nameof(HeartbeatLobby));
+
+        Shutdown();
+    }
+
+    public async void Shutdown()
+    {
+        
+        
+        // strategy to close the game from the host instance
+        HostSingleton.Instance.StopCoroutine(nameof(HeartbeatLobby));
 
         if (!string.IsNullOrEmpty(lobbyId))
         {
@@ -139,8 +151,24 @@ public class HostGameManager : IDisposable
             }
             lobbyId = string.Empty; // if some reason its called twice it wont try to delete it twice
         }
+
+        networkServer.OnClientLeft -= HandleClient;
         networkServer?.Dispose();
-        
+    }
+
+    private async void HandleClient(string authId)
+    {
+        // remove user from lobby based on authid
+        // this is an asynchronous call as you have to await for a response while this is
+        // taking place
+        try
+        {
+            await LobbyService.Instance.RemovePlayerAsync(lobbyId, authId);
+        }
+        catch(LobbyServiceException e)
+        {
+            Debug.Log(e);
+        }
     }
 }
 /*lobby logic create allocation and create join code for it

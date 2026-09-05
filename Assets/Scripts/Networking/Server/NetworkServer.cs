@@ -8,6 +8,8 @@ public class NetworkServer : IDisposable
 {
     private NetworkManager networkManager;
 
+    public Action<string> OnClientLeft;
+
     private Dictionary<ulong, string> clientIDToAuth = new Dictionary<ulong, string>();
     private Dictionary<string, UserData> authIdToUserData = new Dictionary<string, UserData>();
 
@@ -62,6 +64,10 @@ public class NetworkServer : IDisposable
             clientIDToAuth.Remove(clientId); // data removed from dictionary
 
             authIdToUserData.Remove(authId); // removal from second dictionary
+
+            //strategy when a client leaves a game to make room for new players to join lobby and
+            // update lobby state
+            OnClientLeft?.Invoke(authId); // go to lobby service and please remove user from lobby based on id
         }
     }
 

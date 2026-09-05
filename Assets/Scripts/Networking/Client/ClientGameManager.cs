@@ -79,9 +79,14 @@ public class ClientGameManager : IDisposable
         // tell it to start hosting
         NetworkManager.Singleton.StartClient();
     }
-
+    public void Disconnect()
+    {
+        networkClient.Disconnect();
+    }
     public void Dispose()
     {
         networkClient?.Dispose();
     }
+
+    
 }

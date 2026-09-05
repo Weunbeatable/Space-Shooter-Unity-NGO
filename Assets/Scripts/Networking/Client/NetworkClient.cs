@@ -24,9 +24,15 @@ public class NetworkClient : IDisposable
      // will only be called when client disconnected from server. Called when any client disconnects
      // But need a gaurd as a host, if the host disconnects its because they left 
      if(clientId != 0 && clientId != networkManager.LocalClientId) { return; }
-     // if disconnected if game shuts down, automatically disconnected. Need to then be routed to the right scene (main menu)
+        // if leave button not clicked but still disconnected from server, need a way to disconnect still.
+        Disconnect();
+    }
 
-     if(SceneManager.GetActiveScene().name != MenuSceneName)
+    public void Disconnect()
+    {
+        // if disconnected if game shuts down, automatically disconnected. Need to then be routed to the right scene (main menu)
+
+        if (SceneManager.GetActiveScene().name != MenuSceneName)
         {
             SceneManager.LoadScene(MenuSceneName);
         }
@@ -36,7 +42,6 @@ public class NetworkClient : IDisposable
             networkManager.Shutdown();
         }
     }
-
     public void Dispose()
     {
         // unsub from client disconnect
@@ -45,4 +50,6 @@ public class NetworkClient : IDisposable
             networkManager.OnClientConnectedCallback -= OnClientDisconnect;
         }
     }
+
+   
 }
