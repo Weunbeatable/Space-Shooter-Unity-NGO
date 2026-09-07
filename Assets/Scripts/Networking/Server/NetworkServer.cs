@@ -42,8 +42,8 @@ public class NetworkServer : IDisposable
         // this payload is temporary, needs to be stored somewhere
         // when authenticated on client side need to know who they are. 
         // to ways to identify player, info user data passed in and client network id
-        clientIDToAuth[request.ClientNetworkId] = userData.userAuthID; // store id along with user data
-        authIdToUserData[userData.userAuthID] = userData;
+        clientIDToAuth[request.ClientNetworkId] = userData.userAuthId; // store id along with user data
+        authIdToUserData[userData.userAuthId] = userData;
 
         response.Approved = true; // lets users finish connection to server. 
         response.Position = SpawnPoints.GetRandomSpawnPos();

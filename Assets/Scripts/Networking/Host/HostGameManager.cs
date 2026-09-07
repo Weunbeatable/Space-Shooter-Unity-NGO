@@ -98,7 +98,7 @@ public class HostGameManager : IDisposable
         UserData userData = new UserData()
         {
             userName = PlayerPrefs.GetString(NameSelector.playerNameKey, "Missing Name"), // if somehow didn't get a name put missing name
-             userAuthID = AuthenticationService.Instance.PlayerId
+             userAuthId = AuthenticationService.Instance.PlayerId
         };
         // reverse json conversion method converting to Json not from
         string payload = JsonUtility.ToJson(userData);

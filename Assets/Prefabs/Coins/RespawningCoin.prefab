@@ -11,7 +11,7 @@ PrefabInstance:
     - target: {fileID: 325070895690636815, guid: c0841e916893c0f44b1335218ca61fb1,
         type: 3}
       propertyPath: GlobalObjectIdHash
-      value: 1693814071
+      value: 479896237
       objectReference: {fileID: 0}
     - target: {fileID: 4165375646501423749, guid: c0841e916893c0f44b1335218ca61fb1,
         type: 3}
@@ -105,6 +105,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e96cb6065543e43c4a752faaa1468eb1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  UseUnreliableDeltas: 0
   SyncPositionX: 1
   SyncPositionY: 1
   SyncPositionZ: 1

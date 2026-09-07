@@ -15,10 +15,8 @@ public class HealingZone : NetworkBehaviour
     [SerializeField] private float healtTickRate = 1f;
     [SerializeField] private int coinsPerTick = 10; //healing aint free dowg
     [SerializeField] private int healthPerTick = 10; // amount heal power will drop per heal tick
-    [SerializeField] float _FillRateValue;
     [SerializeField] float progressBorder;
-    [SerializeField] float stepSize;
-    [SerializeField] private float progressSteps;
+
 
     private float remainingCooldown;
     private float tickTimer; // time to next tick of healing
@@ -32,17 +30,15 @@ public class HealingZone : NetworkBehaviour
     {
         healMaterialFill = GetComponent<Renderer>().material;
         progressBorder = GetComponent<MeshFilter>().mesh.bounds.size.x / 2f; // set orientation accordingly
-        healMaterialFill.SetFloat("_progressBorder", progressBorder);
-        _FillRateValue = -progressBorder;
-        // for progress bar
-        healMaterialFill.SetFloat("_FillRtate", _FillRateValue); //initial value
-        progressSteps = healthPerTick;
-        stepSize = (2 * progressBorder) / progressSteps;
+        healMaterialFill.SetFloat("_ProgressBorder", progressBorder);
+
+
+
 
         if (IsClient)
         {
             HealPower.OnValueChanged += HandleHealPowerChanged;
-            HandleHealPowerChanged(0, HealPower.Value);
+            HandleHealPowerChanged(HealPower.Value, HealPower.Value);
         }
 
         if (IsServer)
@@ -56,7 +52,7 @@ public class HealingZone : NetworkBehaviour
     {
         if (IsClient)
         {
-            HealPower.OnValueChanged += HandleHealPowerChanged;
+            HealPower.OnValueChanged -= HandleHealPowerChanged;
         }
     }
     private void OnTriggerEnter(Collider other)
@@ -88,7 +84,7 @@ public class HealingZone : NetworkBehaviour
 
             if (remainingCooldown <= 0f)
             {
-                HealPower.Value = healthPerTick;
+                HealPower.Value = MaxHealPower;
             }
             else { return; }
         }
@@ -111,7 +107,7 @@ public class HealingZone : NetworkBehaviour
                 player.Wallet.SpendCoins(coinsPerTick);
                 player.Health.RestoreHealth(healthPerTick);
 
-                HealPower.Value -= 1;
+                HealPower.Value -= healthPerTick;
 
                 if (HealPower.Value == 0)
                 {
@@ -126,7 +122,18 @@ public class HealingZone : NetworkBehaviour
     }
     private void HandleHealPowerChanged(int oldHealPower, int newHealPower)
     {
-        healMaterialFill.SetFloat("_progressBorder", (int)(newHealPower/MaxHealPower));
+        // to account for integer divison not working
+        float normalizedHealPower = (float)newHealPower / MaxHealPower;
+
+        // lerp will allow for a smooth transition in the material visual when updating the healing power
+        // left 
+        float fillRate = Mathf.Lerp(-progressBorder, progressBorder, normalizedHealPower);
+
+        healMaterialFill.SetFloat("_FillRate", fillRate); // fill rate is what modifies depending on
+        // the healing power left over. 
+        // based off current settings I have heal power max = 3, tick -5 so
+        // 25/30 = 0.83 so for fill rate it goes 0.57, ~0.38 etc 
+        //NOTE if progress bar changes so do these values need to change. 
 
     }
 }
