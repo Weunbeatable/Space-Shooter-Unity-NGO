@@ -9,6 +9,8 @@ public class PlayerMovement : NetworkBehaviour
     [SerializeField] private InputReader inputReader;
     [SerializeField] private Transform bodyTransform;
     [SerializeField] private Rigidbody playerBody;
+    [SerializeField] private FlightCameraSettings topDownSettings;
+    [SerializeField] private FlightCameraSettings thirdPersonSettings;
     
     [Header("Settings")]
     [SerializeField] private float movementSpeed = 4f;

@@ -10,13 +10,13 @@ public class HealingZone : NetworkBehaviour
     [SerializeField] private Material healMaterialFill;
 
     [Header("Settings")]
-    [SerializeField] private int MaxHealPower = 30; // how many times it can heal health
+    [SerializeField] private int MaxHealPower = 90; // how many times it can heal health
     [SerializeField] private float healCooldown = 60f;
     [SerializeField] private float healtTickRate = 1f;
     [SerializeField] private int coinsPerTick = 10; //healing aint free dowg
     [SerializeField] private int healthPerTick = 10; // amount heal power will drop per heal tick
     [SerializeField] float progressBorder;
-
+    [SerializeField]private float progressBorderValue = 0.57f;
 
     private float remainingCooldown;
     private float tickTimer; // time to next tick of healing
@@ -28,12 +28,16 @@ public class HealingZone : NetworkBehaviour
 
     public override void OnNetworkSpawn()
     {
-        healMaterialFill = GetComponent<Renderer>().material;
-        progressBorder = GetComponent<MeshFilter>().mesh.bounds.size.x / 2f; // set orientation accordingly
+        //healMaterialFill = GetComponent<Renderer>().material;
+        progressBorder = progressBorderValue;
         healMaterialFill.SetFloat("_ProgressBorder", progressBorder);
 
 
-
+        if (IsServer)
+        {
+            // initalize heal power to mbe max value
+            HealPower.Value = MaxHealPower;
+        }
 
         if (IsClient)
         {
@@ -41,11 +45,7 @@ public class HealingZone : NetworkBehaviour
             HandleHealPowerChanged(HealPower.Value, HealPower.Value);
         }
 
-        if (IsServer)
-        {
-            // initalize heal power to mbe max value
-            HealPower.Value = MaxHealPower;
-        }
+        
     }
 
     public override void OnNetworkDespawn()
@@ -107,9 +107,9 @@ public class HealingZone : NetworkBehaviour
                 player.Wallet.SpendCoins(coinsPerTick);
                 player.Health.RestoreHealth(healthPerTick);
 
-                HealPower.Value -= healthPerTick;
+                HealPower.Value = Mathf.Max(0, HealPower.Value - healthPerTick);
 
-                if (HealPower.Value == 0)
+                if (HealPower.Value <= 0)
                 {
                     remainingCooldown = healCooldown;
                 }

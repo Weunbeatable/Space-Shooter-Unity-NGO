@@ -52,8 +52,8 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _FillRate: -0.55
-    - _ProgressBorder: 1
+    - _FillRate: 0.57
+    - _ProgressBorder: 0.57
     - _QueueControl: 0
     - _QueueOffset: 0
     m_Colors:
