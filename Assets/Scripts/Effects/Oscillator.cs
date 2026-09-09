@@ -7,7 +7,7 @@ public class Oscillator : NetworkBehaviour
 {
     [SerializeField] Rigidbody playerBody;
     [SerializeField] Vector3 movementVector = new Vector3(10f, 10f, 10f);
-    [] InputReader inputReader;
+
     //todo remove from inspector later
     [Range(0, 1)] //  the modifying movement factor
     [SerializeField]
