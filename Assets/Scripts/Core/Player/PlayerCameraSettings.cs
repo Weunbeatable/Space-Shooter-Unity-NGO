@@ -15,25 +15,25 @@ public class PlayerCameraSettings : NetworkBehaviour
     [SerializeField] GameObject playerReference;
     public override void OnNetworkSpawn()
     {
-        GameplayCameraSwitcher.OnThirdPersonEnter += SetupThirdPersonCamera;
-        GameplayCameraSwitcher.OnTopDownEnter += SetupTopDownCamera;
+        PlayerMovement.OnThirdPersonEnter += SetupThirdPersonCamera;
+        PlayerMovement.OnTopDownEnter += SetupTopDownCamera;
     }
 
     
 
     public override void OnNetworkDespawn()
     {
-        GameplayCameraSwitcher.OnThirdPersonEnter -= SetupThirdPersonCamera;
-        GameplayCameraSwitcher.OnTopDownEnter -= SetupTopDownCamera;
+        PlayerMovement.OnThirdPersonEnter -= SetupThirdPersonCamera;
+        PlayerMovement.OnTopDownEnter -= SetupTopDownCamera;
     }
 
-    private void SetupThirdPersonCamera(GameObject playerObject)
+    private void SetupThirdPersonCamera()
     {
         if (!IsOwner) { return; }
         playerCamera.Priority = 14;
         ThirdPersonCamera.Priority = 15;
     }
-    private void SetupTopDownCamera(GameObject playerObject)
+    private void SetupTopDownCamera()
     {
         if (!IsOwner) { return; }
         ThirdPersonCamera.Priority = 14;

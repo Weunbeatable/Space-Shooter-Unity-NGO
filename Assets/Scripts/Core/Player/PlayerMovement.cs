@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
@@ -5,6 +6,9 @@ using UnityEngine;
 
 public class PlayerMovement : NetworkBehaviour
 {
+    public static Action OnThirdPersonEnter; //  subscribed to by player movement, player aiming AND a player camera as those are separate concerns 
+    public static Action OnTopDownEnter;
+
     [Header("References")]
     [SerializeField] private InputReader inputReader;
     [SerializeField] private Transform bodyTransform;
@@ -21,6 +25,8 @@ public class PlayerMovement : NetworkBehaviour
     [Tooltip("Adjust this property to change how fast the ship will change altitude")]
     [SerializeField] private float altitudespeedChangeRate = .15f; // subject to change 
 
+    [SerializeField] private bool UseControls = true; 
+
     Vector3 previousMovementInput;
 
     // network spwan instead of start to avoid sync issues.   
@@ -32,8 +38,6 @@ public class PlayerMovement : NetworkBehaviour
         inputReader.ChangeAltitudeEvent += ChangeAltitude;
     }
 
-   
-
     public override void OnNetworkDespawn()
     {
        if (!IsOwner) return;
@@ -44,6 +48,7 @@ public class PlayerMovement : NetworkBehaviour
     {
         if (!IsOwner) return;
         // input of our device * -turn rate so its not inverted and make framerate independent
+        if(UseControls == false) { return; }
         float yRotation = previousMovementInput.x * -turningRate * Time.deltaTime;
         
         bodyTransform.Rotate(0f, yRotation, 0f);
@@ -53,6 +58,7 @@ public class PlayerMovement : NetworkBehaviour
     {
         if(!IsOwner) return;
         
+        if(UseControls == false) { return; }
         playerBody.velocity = bodyTransform.forward.normalized* previousMovementInput.y * movementSpeed;
 
         Vector3 newAltitude = playerBody.position;
@@ -71,6 +77,7 @@ public class PlayerMovement : NetworkBehaviour
     private void HandleMove(Vector2 movementInput)
     {
       //  previousMovementInput = movementInput;
+      if(UseControls == false) { return; }
         previousMovementInput = new Vector3(movementInput.x, movementInput.y, 0f).normalized;
     }
 
@@ -80,4 +87,68 @@ public class PlayerMovement : NetworkBehaviour
         Debug.Log("Updating altitude");
         didAltitudeChange = !didAltitudeChange;
     }
+
+    public void TriggerThirdPersonMode()
+    {
+        if (!IsServer) { return; }
+
+        // setup client rpc params
+        ClientRpcParams clientRpc = new ClientRpcParams
+        {
+            // send params to targeted client in this case i'm getting the target based off thier Id
+            Send = new ClientRpcSendParams
+            {
+                TargetClientIds = new ulong[]
+                {
+                    OwnerClientId,
+                }
+            }
+        };
+        ActivateThirdPersonControlsClientRpc(clientRpc);
+        
+    }
+    internal void TriggerTopDownMode()
+    {
+        if (!IsServer) { return; }
+
+        ClientRpcParams clientRpc = new ClientRpcParams
+        {
+            Send = new ClientRpcSendParams
+            {
+                TargetClientIds = new ulong[]
+                {
+                    OwnerClientId,
+                }
+            }
+        };
+        ActivateTopDownControlsClientRpc(clientRpc);
+        
+    }
+
+    [ClientRpc]
+    private void ActivateThirdPersonControlsClientRpc(ClientRpcParams ship = default)
+    {
+        //disable controls
+        UseControls = false;
+
+        // Notify this client's camera + ThirdPersonControls
+        OnThirdPersonEnter?.Invoke();
+
+    }
+    [ClientRpc]
+    private void ActivateTopDownControlsClientRpc(ClientRpcParams ship = default)
+    {
+        UseControls = true;
+        FlyBackToStartingTopDownHeight();
+        OnTopDownEnter?.Invoke();
+    }
+
+    private void FlyBackToStartingTopDownHeight()
+    {
+        Vector3 newAltitude = playerBody.position;
+        float ypos = playerBody.velocity.y;
+        newAltitude.y = altitudePositions[0];
+        playerBody.position = Vector3.Lerp(playerBody.position, newAltitude, altitudespeedChangeRate * Time.deltaTime);
+    }
+
 }

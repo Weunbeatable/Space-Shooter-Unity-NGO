@@ -49,6 +49,15 @@
                     "processors": "",
                     "interactions": "Press,Hold,MultiTap",
                     "initialStateCheck": true
+                },
+                {
+                    "name": "Boost",
+                    "type": "Button",
+                    "id": "ae8fbc32-2ef5-4a07-b652-319fa57f70c7",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -56,17 +65,6 @@
                     "name": "",
                     "id": "124ee985-1aff-4a1f-836f-09cb85227459",
                     "path": "<Mouse>/leftButton",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "Mouse&Key",
-                    "action": "Primary Fire",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "e3d4fd73-686f-4a3d-af88-16401815f359",
-                    "path": "<Keyboard>/space",
                     "interactions": "",
                     "processors": "",
                     "groups": "Mouse&Key",
@@ -313,6 +311,28 @@
                     "processors": "",
                     "groups": "Controller",
                     "action": "Use Ability",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "8e09d00b-853b-447f-ba04-24c4050e91e6",
+                    "path": "<Keyboard>/space",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Mouse&Key",
+                    "action": "Boost",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "eca88d68-df5f-481c-9689-1133d3087f52",
+                    "path": "<Gamepad>/buttonSouth",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Controller",
+                    "action": "Boost",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

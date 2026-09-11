@@ -13,6 +13,7 @@ public class InputReader : ScriptableObject, IPlayerActions
     public event Action<bool> ChangeAltitudeEvent;
     public event Action<bool> UseAbilityEvent;
     public event Action<Vector2> MoveEvent;
+    public event Action<bool> BoostFireEvent;
 
     public Vector2 AimPosition {  get; private set; }
     private Controls controls;
@@ -78,6 +79,18 @@ public class InputReader : ScriptableObject, IPlayerActions
         else if (context.canceled)
         {
             UseAbilityEvent?.Invoke(false);
+        }
+    }
+
+    public void OnBoost(InputAction.CallbackContext context)
+    {
+        if (context.performed)
+        {
+            BoostFireEvent?.Invoke(true);
+        }
+        else if (context.canceled)
+        {
+            BoostFireEvent?.Invoke(false);
         }
     }
 }
