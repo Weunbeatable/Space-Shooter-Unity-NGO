@@ -12,8 +12,9 @@ public class ThirdPersonControls : NetworkBehaviour
     [Tooltip("How fast ship moves up and down based upon player input")][SerializeField] float controlSpeed = 20f;
     [Tooltip("control the x constraints for movement")][SerializeField] float xRange = 5f; // the range our player can move left and right
     [Tooltip("Control y constraints for movement")][SerializeField] float yRange = 7f;
+    [SerializeField] private float inputDeadZone = 0.12f;
 
-    [Header("Ship position based  Tuning")]
+    [Header("Ship position based  Tuning for ship parent")]
     [Tooltip("position control of ship")][SerializeField] float positionPitchFator = -2f; // how much we affect the change in ship position upon using a control
     [Tooltip("adjust values to affect ships yaw position")][SerializeField] float positionYawFactor = -5f;
     [Tooltip("refernce to player rigidbody")][SerializeField] Rigidbody playerBody;
@@ -27,16 +28,22 @@ public class ThirdPersonControls : NetworkBehaviour
     [SerializeField] private float yawRate = 90f;
     [SerializeField] private float pitchRate = 60f;
     Vector3 previousMovementInput;
-    float yThrow;
-    float xThrow;
-    
+
+    [Header("Ship child visual position/orientation")]
+    [SerializeField] private Transform shipVisual;
+    [SerializeField] private float maxRollAngle = 3f;
+    [SerializeField] private float visualRotationSpeed = 6f;
+
+    private Quaternion startingVisualRotation; 
+
     [Header("Controls activation status")]
     [Tooltip("Value that helps determine if current control scheme is being used")][SerializeField] private bool UseControls;
     [Tooltip("Value that determines if user is intending to move with forward momentum.")][SerializeField] private bool IsBoosting;
     public override void OnNetworkSpawn()
     {
         if (!IsOwner) return;
-
+        // setting visual for ship 
+        startingVisualRotation = shipVisual.localRotation;
         inputReader.MoveEvent += HandleMove;
         inputReader.BoostFireEvent += BoostForward;
         PlayerMovement.OnThirdPersonEnter += ActivateControls;
@@ -64,16 +71,31 @@ public class ThirdPersonControls : NetworkBehaviour
         if(UseControls == false) return;
         ProcessTranslation();
         ProcessRotation();
+        ProcessVisualRotation();
     }
 
     private void ProcessRotation()
     {
+        // start ship from its current facing direction THEN rotate it until user inputs values
         float yaw = previousMovementInput.x * yawRate * Time.fixedDeltaTime;
         float pitch = -previousMovementInput.y * pitchRate * Time.fixedDeltaTime;
 
         Quaternion rotationDelta = Quaternion.Euler(pitch, yaw, 0f);
 
         playerBody.MoveRotation(playerBody.rotation * rotationDelta);
+    }
+
+    private void ProcessVisualRotation()
+    {
+        // purupose of this is to help match the visuals of the ship to the rotation on the parent
+        float roll = -previousMovementInput.x * maxRollAngle;
+
+        Quaternion targetRotation = startingVisualRotation * Quaternion.Euler(0f, 0f, roll);
+
+        shipVisual.localRotation =
+            Quaternion.Slerp(shipVisual.localRotation,
+            targetRotation,
+            visualRotationSpeed * Time.fixedDeltaTime);
     }
 
     private void ProcessTranslation()
@@ -92,11 +114,8 @@ public class ThirdPersonControls : NetworkBehaviour
        // playerBody.position = new Vector3(clampedXPos, clampedYPos, playerBody.position.z);// this allows us to move the ship in 3D space hence vector3, clampedxpos restricts our left and right movement
         if(IsBoosting == true)
         {
-            //playerBody.AddForce(transform.forward * ThrustValue, ForceMode.Force);
-            Vector3 shipComponent = transform.forward.normalized;
-            //shipComponent.y = Mathf.Clamp(shipComponent.y, -30f, 5f);
-            //shipComponent.x = 0f;
-            playerBody.velocity = -shipComponent.normalized  *ThrustValue;
+
+            playerBody.velocity = playerBody.transform.forward  *ThrustValue;
         }
         else
         {
@@ -115,16 +134,35 @@ public class ThirdPersonControls : NetworkBehaviour
     {
         //  previousMovementInput = movementInput;
         if (UseControls == false) { return; }
-        previousMovementInput = new Vector3(movementInput.x, movementInput.y, 0f).normalized;
+        // instead of using normalized vectors which ramp everything to one having a deadzone
+        // will allow for users with stick drift to not be at a disadvantage and also make movement less harsh
+        if(movementInput.magnitude < inputDeadZone)
+        {
+            previousMovementInput = Vector3.zero;
+            return;
+        }
+        previousMovementInput = new Vector3(movementInput.x, movementInput.y, 0f);
     }
 
     private void ActivateControls()
     {
+        // reset input values when entering third person to avoid the weird movement i was getting where I was bouncing
+        // in and out of the third person field 
+        previousMovementInput = Vector3.zero;
+        IsBoosting = false;
+
+        //playerBody.velocity = Vector3.zero;
+       // playerBody.angularVelocity = Vector3.zero;
         UseControls = true;
     }
     private void DeactivateControls()
     {
         UseControls = false;
+        previousMovementInput = Vector3.zero;
+        IsBoosting = false;
+
+       // playerBody.velocity = Vector3.zero;
+       // playerBody.angularVelocity = Vector3.zero;
     }
     private void BoostForward(bool IsBoosting)
     {

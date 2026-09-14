@@ -28,12 +28,13 @@ public class PlayerMovement : NetworkBehaviour
     [SerializeField] private bool UseControls = true; 
 
     Vector3 previousMovementInput;
+    
 
     // network spwan instead of start to avoid sync issues.   
     public override void OnNetworkSpawn()
     {
       if(!IsOwner) return;
-
+     
         inputReader.MoveEvent += HandleMove;
         inputReader.ChangeAltitudeEvent += ChangeAltitude;
     }
@@ -146,9 +147,12 @@ public class PlayerMovement : NetworkBehaviour
     private void FlyBackToStartingTopDownHeight()
     {
         Vector3 newAltitude = playerBody.position;
+        transform.rotation = Quaternion.identity;
         float ypos = playerBody.velocity.y;
         newAltitude.y = altitudePositions[0];
-        playerBody.position = Vector3.Lerp(playerBody.position, newAltitude, altitudespeedChangeRate * Time.deltaTime);
+        Vector3 resetPosotion = playerBody.position;
+        resetPosotion.y = altitudePositions[0];
+        playerBody.position = resetPosotion;
     }
 
 }

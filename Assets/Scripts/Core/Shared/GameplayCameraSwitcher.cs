@@ -14,6 +14,9 @@ public class GameplayCameraSwitcher : NetworkBehaviour
     private void OnTriggerEnter(Collider other)
     {
         if (!IsServer) { return; }
+        if(other.attachedRigidbody == null) { return; }
+        if (other.attachedRigidbody.gameObject.layer == 6) { return; } // if they are projectiles don't add them to the list. 
+        // going forward there should be a list of layers that are excluded because as abilties and other objects are created they will need to be added to the list of exceptions 
         if (!other.attachedRigidbody.TryGetComponent<PlayerMovement>(out PlayerMovement player)) { return; }
         {
             player.TriggerThirdPersonMode();
@@ -23,6 +26,9 @@ public class GameplayCameraSwitcher : NetworkBehaviour
     private void OnTriggerExit(Collider other)
     {
         if (!IsServer) { return; }
+        if (other.attachedRigidbody == null) { return; }
+        if (other.attachedRigidbody.gameObject.layer == 6) { return; } // if they are projectiles don't add them to the list. 
+        // going forward there should be a list of layers that are excluded because as abilties and other objects are created they will need to be added to the list of exceptions 
         if (!other.attachedRigidbody.TryGetComponent<PlayerMovement>(out PlayerMovement player)) { return; }
         {
             player.TriggerTopDownMode();
