@@ -1,3 +1,22 @@
+
+
+portals: - portals live onthe map, driving near them will trigger a special camera effect that will move your camera view so you can see the portal effect, going in 
+will trigger a screen wide shader, for other players they will hear a sound effect and maybe an effect on the minimap to indicate you've teleported and leaving the portal will have a camera effect also
+before resulting back to the default camera. There will be a few portals on the map as the map will be larger, may have color codes to make it easy to distinguish where you will end up. 
+portal will activate as well when you're in range and may have some slight pull if idle. Closer you get more intense effect will be ( will need to expose some vfx graph variables) 
+If you're not in the field of influence aka where the camera shifts and it pulls (have some rocks rotating around the area) portal effect is inactive. only shows when you're in range. Getting within range affects your speed as well.
+
+
+MOVING STRUCTURE
+moving healing zone (make a bigger health station and add nodes for a movement path. have it move along nodes at a certain speed), can go into the level as well. 
+
+
+SHIP CLASS
+Multiple ship types to choose from with different stats. (maybe a stats bar to show balance like in mario kart) like in mario kart.
+
+
+ABILITIES
+
 DO A BARREL ROLL : - barrel roll ability that will rotate the body of the ship really quickly in the Z axis.
 This will temporarily disable shooting but grant some I frames and reflect projectiles. 
 
@@ -9,35 +28,31 @@ standard shooting: - fire shots from turrent
 
 charged shooting : - press and hold for a charged shot that will do more damage. 
 
-Homing missiles: press to fire homing missiles that will find targets and deal damage. 
+Homing missiles: press to fire homing missiles that will find targets and deal damage. (passive ability, missiles will fire on their own )
 
-Shields up: - activate shields that will protect from damage
+Shields up: - activate shields that will protect from damage 
 
 EMP: :- emp pulse will be a 360 aoe that will temporarily disable all movement for up to 3 seconds. (mashing keys will help reduce 
 stun)
 
 Get hacked: - Temporarily take control of another users ship for 5 seconds. you can veer them off to and deplete their resources, while 
-active you will be invulnerable for 3 seconds and a sitting duck for the remaining 2. 
+active you will be invulnerable for 3 seconds and a sitting duck for the remaining 2. (in a team setting this means friendly fire will be temporarily on)
 
 Stick drift: - You will move in the opposite direction of your controls for 5 seconds
 
-Overdrive, : - greatly reduce cooldown on your abilities and move faster for a period of time. 
+Overdrive, : - greatly reduce cooldown on your abilities and move faster for a period of time. (passive skill with a cooldown )
 hghjhjkjlhjkhdaf
 
-portals: - portals live onthe map, driving near them will trigger a special camera effect that will move your camera view so you can see the portal effect, going in 
-will trigger a screen wide shader, for other players they will hear a sound effect and maybe an effect on the minimap to indicate you've teleported and leaving the portal will have a camera effect also
-before resulting back to the default camera. There will be a few portals on the map as the map will be larger, may have color codes to make it easy to distinguish where you will end up. 
-portal will activate as well when you're in range and may have some slight pull if idle. Closer you get more intense effect will be ( will need to expose some vfx graph variables) 
-If you're not in the field of influence aka where the camera shifts and it pulls (have some rocks rotating around the area) portal effect is inactive. only shows when you're in range. Getting within range affects your speed as well. 
+ 
 
 possible upgrade healthbar wraps around ship or ship texture material changes based on damage so its easy to tell. 
 
-Multiple ship types to choose from with different stats. (maybe a stats bar to show balance like in mario kart) like in mario kart.
+
 USE BRECHMAN LINE ALGORITHM AND OTHER UDEMY COURSE FOR PROCEDURAL GENERATION TO PROCEDURALLY GENERATE DEBRIS AND OTHER TERRAIN ON THE MAP
 GREAT LEARNING OPPORTUNITY 
 
 Different ships can have unique traits e.g. better shield attunement, bonus bombs or lasers etc. 
 
-moving healing zone
+
 
 add chat system. I think everything is there from the leaderboard stuff

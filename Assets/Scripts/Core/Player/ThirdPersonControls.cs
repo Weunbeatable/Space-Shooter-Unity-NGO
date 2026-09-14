@@ -24,6 +24,8 @@ public class ThirdPersonControls : NetworkBehaviour
     [Tooltip("Adjust to affect ships yaw movement")][SerializeField] float controlYawFactor = -10f;
     [Tooltip("adjust to controll the roll 'Z' factor of ship")][SerializeField] float controlRollFactor = -25f;
     [Tooltip("pitch control of ship")][SerializeField] float controlPitchFactor = -10f; // how much we see the pitch being affected by our mouse movement
+    [SerializeField] private float yawRate = 90f;
+    [SerializeField] private float pitchRate = 60f;
     Vector3 previousMovementInput;
     float yThrow;
     float xThrow;
@@ -66,21 +68,12 @@ public class ThirdPersonControls : NetworkBehaviour
 
     private void ProcessRotation()
     {
-        float pitchDueToPosition = playerBody.position.y * positionPitchFator;
-        float PitchDueToControlThrow = previousMovementInput.y * controlPitchFactor;
+        float yaw = previousMovementInput.x * yawRate * Time.fixedDeltaTime;
+        float pitch = -previousMovementInput.y * pitchRate * Time.fixedDeltaTime;
 
-        float yawDueToPosition = playerBody.position.x * positionYawFactor;
-        float yawDuetoControlThrow = previousMovementInput.x * controlYawFactor;
+        Quaternion rotationDelta = Quaternion.Euler(pitch, yaw, 0f);
 
-        float rollDueToControlThrow = previousMovementInput.x * controlRollFactor;
-
-        float pitch = pitchDueToPosition + PitchDueToControlThrow;
-        float yaw = yawDueToPosition;
-        float roll = rollDueToControlThrow; // these three will be updated based upon position, an dposition of craft as well as how player is positioning the controller
-        playerBody.rotation = Quaternion.Euler(pitch, yaw, roll); // Quaternions relate to our rotation. x, y, z = pitch, yaw and roll
-        Debug.Log("Ship_Pitch " + pitch);
-        Debug.Log("Ship_Yaw " + yaw);
-        Debug.Log("Ship_Roll " + roll);
+        playerBody.MoveRotation(playerBody.rotation * rotationDelta);
     }
 
     private void ProcessTranslation()
@@ -101,9 +94,9 @@ public class ThirdPersonControls : NetworkBehaviour
         {
             //playerBody.AddForce(transform.forward * ThrustValue, ForceMode.Force);
             Vector3 shipComponent = transform.forward.normalized;
-            shipComponent.y = Mathf.Clamp(shipComponent.y, -30f, 5f);
-            shipComponent.x = 0f;
-            playerBody.velocity = -shipComponent  *ThrustValue;
+            //shipComponent.y = Mathf.Clamp(shipComponent.y, -30f, 5f);
+            //shipComponent.x = 0f;
+            playerBody.velocity = -shipComponent.normalized  *ThrustValue;
         }
         else
         {

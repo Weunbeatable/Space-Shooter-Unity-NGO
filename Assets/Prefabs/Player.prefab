@@ -5618,18 +5618,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   inputReader: {fileID: 11400000, guid: 2b0ed51268b2b1f46af1702daa4f5fef, type: 2}
   controlSpeed: 20
-  xRange: 4
-  yRange: 5
-  positionPitchFator: -2
-  positionYawFactor: -5
   playerBody: {fileID: 6364529844426862324}
   ThrustValue: 25
   BrakeValue: 15
-  controlYawFactor: -15
-  controlRollFactor: -30
-  controlPitchFactor: -15
   UseControls: 0
   IsBoosting: 0
+  yawRate: 90
+  inputDeadZone: 0.12
+  shipVisual: {fileID: 1679879308936963058}
+  maxRollAngle: 35
+  maxPitchAngle: 12
+  visualRotationSpeed: 6
 --- !u!114 &5379658166225888982
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6488,9 +6487,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_BindingMode: 1
   m_FollowOffset: {x: 0, y: 4.91, z: -10}
-  m_XDamping: 0.05
-  m_YDamping: 0.05
-  m_ZDamping: 0.15
+  m_XDamping: 0.2
+  m_YDamping: 0.2
+  m_ZDamping: 0.3
   m_AngularDampingMode: 0
   m_PitchDamping: 0
   m_YawDamping: 0
