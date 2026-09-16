@@ -33,6 +33,7 @@ public class ThirdPersonControls : NetworkBehaviour
     [SerializeField] private Transform shipVisual;
     [SerializeField] private float maxRollAngle = 3f;
     [SerializeField] private float visualRotationSpeed = 6f;
+    [SerializeField] private ParticleSystem boostVisual;
 
     private Quaternion startingVisualRotation; 
 
@@ -154,6 +155,7 @@ public class ThirdPersonControls : NetworkBehaviour
         //playerBody.velocity = Vector3.zero;
        // playerBody.angularVelocity = Vector3.zero;
         UseControls = true;
+        
     }
     private void DeactivateControls()
     {
@@ -166,6 +168,11 @@ public class ThirdPersonControls : NetworkBehaviour
     }
     private void BoostForward(bool IsBoosting)
     {
+        if (IsBoosting == true && UseControls == true)
+        {
+            boostVisual.Play();
+        }
+        
         this.IsBoosting = IsBoosting;
     }
 

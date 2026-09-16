@@ -12,6 +12,7 @@ public class PlayerCameraSettings : NetworkBehaviour
     [Header("Camera references")]
     [SerializeField] private CinemachineVirtualCamera playerCamera;
     [SerializeField] private CinemachineVirtualCamera ThirdPersonCamera;
+    [SerializeField] private CinemachineVirtualCamera BoostCamera; 
     [SerializeField] GameObject playerReference;
     public override void OnNetworkSpawn()
     {
