@@ -41,4 +41,16 @@ public class PlayerCameraSettings : NetworkBehaviour
         playerCamera.Priority = 15;
         
     }
+    public void TriggerBoostCamera(bool IsBoosting)
+    {
+        if (!IsOwner) { return; }
+        if (IsBoosting == true)
+        {
+            BoostCamera.Priority = 20;
+        }
+        else
+        {
+            BoostCamera.Priority = 9;
+        }
+    }
 }

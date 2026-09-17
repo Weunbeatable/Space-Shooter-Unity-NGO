@@ -168,12 +168,15 @@ public class ThirdPersonControls : NetworkBehaviour
     }
     private void BoostForward(bool IsBoosting)
     {
+        this.IsBoosting = IsBoosting; // should this be the first thing in the function call? 
         if (IsBoosting == true && UseControls == true)
         {
             boostVisual.Play();
-        }
-        
-        this.IsBoosting = IsBoosting;
+            if (this.gameObject.TryGetComponent<PlayerCameraSettings>(out PlayerCameraSettings cameraSettings))
+            {
+                cameraSettings.TriggerBoostCamera(IsBoosting);
+            }
+        }   
     }
 
 }
