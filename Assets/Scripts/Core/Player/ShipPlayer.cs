@@ -20,6 +20,7 @@ public class ShipPlayer : NetworkBehaviour
     [SerializeField] public int ownerSeconndaryPriority { get; set; } = 14;
 
     [SerializeField] private Color ownerColor;
+    [field: SerializeField] public Rigidbody playerBody { get; set; }
     [field: SerializeField] public Health Health { get; set; } // field will leave it exposed in editor without open to modification
     [field: SerializeField] public CoinWallet Wallet { get; set; } // field will leave it exposed in editor without open to modification
     // network variable that will sync over the network
@@ -59,4 +60,30 @@ public class ShipPlayer : NetworkBehaviour
             OnPlayerDespawned?.Invoke(this);
         }
     }
+
+    public void RequestToTeleportClientShip(Vector3 destinationToTeleportTo)
+    {
+        if(!IsServer) { return; }
+
+        // create client rpc object params
+        ClientRpcParams clientRpcShip = new ClientRpcParams
+        {
+            Send = new ClientRpcSendParams
+            {
+                TargetClientIds = new ulong[]
+                {
+                    OwnerClientId,
+                }
+            }
+        };
+       TeleportPlayerShipClientRpc(destinationToTeleportTo, clientRpcShip);
+    }
+
+    [ClientRpc]
+    private void TeleportPlayerShipClientRpc(Vector3 location, ClientRpcParams playerShip = default)
+    {
+        playerBody.position = location;
+    }
+
+
 }

@@ -25,7 +25,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 65117776924542798}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.19750683, y: -0, z: -0, w: 0.9803015}
+  m_LocalRotation: {x: 0.19750683, y: -0, z: -0, w: 0.98030156}
   m_LocalPosition: {x: 0, y: 4.2, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -10770,6 +10770,7 @@ MonoBehaviour:
   thirdPersonCam: {fileID: 7694647523889801409}
   minimapIconRenderer: {fileID: 266937252078270041}
   ownerColor: {r: 0.02441454, g: 0, b: 1, a: 1}
+  <playerBody>k__BackingField: {fileID: 6364529844426862324}
   <Health>k__BackingField: {fileID: 3105937173566829754}
   <Wallet>k__BackingField: {fileID: 8486174707522401164}
   PlayerName:
@@ -16312,7 +16313,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8915198008900858238}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.19750683, y: -0, z: -0, w: 0.98030156}
+  m_LocalRotation: {x: 0.19750683, y: -0, z: -0, w: 0.9803015}
   m_LocalPosition: {x: 0, y: 4.2, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0

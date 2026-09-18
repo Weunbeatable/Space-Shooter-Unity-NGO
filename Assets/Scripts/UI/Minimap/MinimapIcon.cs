@@ -38,7 +38,6 @@ public class MinimapIcon : NetworkBehaviour
     private void LateUpdate()
     {
         if (!IsOwner) { return; }
-        Debug.Log("late rotate value is " + yRotation);
         transform.Rotate(0f, 0f, -yRotation);
     }
 }

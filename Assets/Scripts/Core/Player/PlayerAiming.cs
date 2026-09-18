@@ -20,6 +20,13 @@ public class PlayerAiming : NetworkBehaviour
     private bool useThirdPersonAiming = false; 
     private Camera mainCamera;
 
+    [Header("Third Person Aim")]
+    [SerializeField] private float thirdPersonAimDistance = 100f;
+    [SerializeField] private float turretAimSpeed = 360f;
+
+    [SerializeField] private float maxYaw = 90f;
+    [SerializeField] private float maxPitch = 45f;
+
     public override void OnNetworkSpawn()
     {
         PlayerMovement.OnTopDownEnter += UseTopDownAiming;
@@ -69,15 +76,19 @@ public class PlayerAiming : NetworkBehaviour
         //aimWorldPos.z = 0f; // don't need depth;
 
         Vector3 direction = (aimWorldPos - turretMount.position).normalized;
-        Vector3 targetRotation = Quaternion.LookRotation(-direction).eulerAngles;
+        Quaternion targetRotation = Quaternion.LookRotation(direction);
 
-        newRotation = new Vector3(
-            Mathf.SmoothDamp(newRotation.x, targetRotation.x, ref xVel, smoothTime * Time.fixedDeltaTime),
-            Mathf.SmoothDamp(newRotation.y, targetRotation.y, ref yVel, smoothTime * Time.fixedDeltaTime),
-            Mathf.SmoothDamp(newRotation.z, targetRotation.z, ref zVel, smoothTime * Time.fixedDeltaTime));
-        turretTransform.eulerAngles = newRotation; 
+        //newRotation = new Vector3(
+        //    Mathf.SmoothDamp(newRotation.x, targetRotation.x, ref xVel, smoothTime * Time.fixedDeltaTime),
+        //    Mathf.SmoothDamp(newRotation.y, targetRotation.y, ref yVel, smoothTime * Time.fixedDeltaTime),
+        //    Mathf.SmoothDamp(newRotation.z, targetRotation.z, ref zVel, smoothTime * Time.fixedDeltaTime));
 
-       // turretMount.rotation = Quaternion.RotateTowards(transform.rotation, Quaternion.LookRotation(direction), 1000 );
+        //turretTransform.eulerAngles = newRotation;
+        turretTransform.localRotation = Quaternion.RotateTowards(turretTransform.localRotation, targetRotation, 180f * Time.fixedDeltaTime);
+        Debug.Log("local rotation is " + turretTransform.localRotation);
+        Debug.Log("target rotation is " + targetRotation);
+        // turretMount.rotation = Quaternion.RotateTowards(transform.rotation, Quaternion.LookRotation(direction), 1000 );
+       // Debug.Log("TARGET ROTATION IS " + newRotation);
 
     }
 

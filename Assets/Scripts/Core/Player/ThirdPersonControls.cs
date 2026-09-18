@@ -4,6 +4,7 @@ using UnityEngine;
 using Unity.Netcode;
 using System;
 
+
 public class ThirdPersonControls : NetworkBehaviour
 {
     [Header("input controller")]
@@ -126,9 +127,6 @@ public class ThirdPersonControls : NetworkBehaviour
                 playerBody.AddForce(brakeForce * BrakeValue, ForceMode.Force);
             }
         }
-
-        Debug.Log("X_Controller_Pos " + clampedXPos);
-        Debug.Log("Y_Controller_Pos " + clampedYPos);
     }
 
     private void HandleMove(Vector2 movementInput)
@@ -162,9 +160,12 @@ public class ThirdPersonControls : NetworkBehaviour
         UseControls = false;
         previousMovementInput = Vector3.zero;
         IsBoosting = false;
-
-       // playerBody.velocity = Vector3.zero;
-       // playerBody.angularVelocity = Vector3.zero;
+        if (this.gameObject.TryGetComponent<PlayerCameraSettings>(out PlayerCameraSettings cameraSettings))
+        {
+            cameraSettings.TriggerBoostCamera(false);
+        }
+        // playerBody.velocity = Vector3.zero;
+        // playerBody.angularVelocity = Vector3.zero;
     }
     private void BoostForward(bool IsBoosting)
     {
@@ -172,11 +173,21 @@ public class ThirdPersonControls : NetworkBehaviour
         if (IsBoosting == true && UseControls == true)
         {
             boostVisual.Play();
-            if (this.gameObject.TryGetComponent<PlayerCameraSettings>(out PlayerCameraSettings cameraSettings))
+          
+        }
+        if (this.gameObject.TryGetComponent<PlayerCameraSettings>(out PlayerCameraSettings cameraSettings))
+        {
+            if (IsBoosting == true && UseControls == true)
             {
-                cameraSettings.TriggerBoostCamera(IsBoosting);
+                cameraSettings.TriggerBoostCamera(true);
+
             }
-        }   
+            else
+            {
+                cameraSettings.TriggerBoostCamera(false);
+            }
+        }
+
     }
 
 }

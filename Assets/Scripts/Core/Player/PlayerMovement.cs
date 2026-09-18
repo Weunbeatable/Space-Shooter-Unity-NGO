@@ -12,7 +12,7 @@ public class PlayerMovement : NetworkBehaviour
     [Header("References")]
     [SerializeField] private InputReader inputReader;
     [SerializeField] private Transform bodyTransform;
-    [SerializeField] private Rigidbody playerBody;
+    [SerializeField] public Rigidbody playerBody;
     [SerializeField] private FlightCameraSettings topDownSettings;
     [SerializeField] private FlightCameraSettings thirdPersonSettings;
     
