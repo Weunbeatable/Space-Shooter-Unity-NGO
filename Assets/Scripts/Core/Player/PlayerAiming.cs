@@ -66,29 +66,38 @@ public class PlayerAiming : NetworkBehaviour
 
         Vector2 mousePosition = inputReader.AimPosition;
 
-        // solution from joah wong in unity multiplayer netcode course ty chat
+        Ray mouseRay = mainCamera.ScreenPointToRay(mousePosition);
 
-        Vector3 mouseScreenPosition = new Vector3(
-            mousePosition.x,
-            mousePosition.y,
-            -Camera.main.transform.position.z);
-        Vector3 aimWorldPos = Camera.main.ScreenToWorldPoint(mouseScreenPosition);
-        //aimWorldPos.z = 0f; // don't need depth;
+        // put a  plane in front of the ship and turret irregardless of wolrd rotation
+        // this goes back to an earlier solution, the math was just wrong with the plane
+        // corrective math was found in chat after other failed attempts that can be seen in past commits. 
+        Vector3 planePosition = turretMount.position + turretMount.forward * thirdPersonAimDistance;
 
-        Vector3 direction = (aimWorldPos - turretMount.position).normalized;
-        Quaternion targetRotation = Quaternion.LookRotation(direction);
+        Plane aimingPlane = new Plane(turretMount.forward, planePosition);
 
-        //newRotation = new Vector3(
-        //    Mathf.SmoothDamp(newRotation.x, targetRotation.x, ref xVel, smoothTime * Time.fixedDeltaTime),
-        //    Mathf.SmoothDamp(newRotation.y, targetRotation.y, ref yVel, smoothTime * Time.fixedDeltaTime),
-        //    Mathf.SmoothDamp(newRotation.z, targetRotation.z, ref zVel, smoothTime * Time.fixedDeltaTime));
+        if(!aimingPlane.Raycast(mouseRay, out float distance)) { return; } // dont calculate if ray doesn't hit anything. 
 
-        //turretTransform.eulerAngles = newRotation;
-        turretTransform.localRotation = Quaternion.RotateTowards(turretTransform.localRotation, targetRotation, 180f * Time.fixedDeltaTime);
-        Debug.Log("local rotation is " + turretTransform.localRotation);
-        Debug.Log("target rotation is " + targetRotation);
-        // turretMount.rotation = Quaternion.RotateTowards(transform.rotation, Quaternion.LookRotation(direction), 1000 );
-       // Debug.Log("TARGET ROTATION IS " + newRotation);
+        Vector3 targetWorldPosition = mouseRay.GetPoint(distance); // figure out where the ray hits to find intersection 
+        
+        Vector3 worldDirection = (targetWorldPosition - turretMount.position).normalized; // figure out direction to face by subtracting and normalizing vectors
+
+        // convert world direction to turrets local space. 
+        Vector3 localDirection = turretMount.InverseTransformDirection(worldDirection);
+
+        float yaw = Mathf.Atan2(localDirection.x, localDirection.z) * Mathf.Rad2Deg; 
+
+        float horizontalDistance = Mathf.Sqrt(localDirection.x * localDirection.x+localDirection.z * localDirection.z);
+
+        float pitch = -Mathf.Atan2(localDirection.y, horizontalDistance) * Mathf.Rad2Deg; // - value to account for mouse input and facing direction of mount
+
+        // lock turret facing to only front view
+        yaw = Mathf.Clamp(yaw, -maxYaw, maxYaw);
+
+        pitch = Mathf.Clamp(pitch, -maxPitch, maxPitch);
+
+        Quaternion targetLocalRotation = Quaternion.Euler(-pitch, yaw, 0f);
+
+        turretTransform.localRotation = Quaternion.RotateTowards(turretTransform.localRotation, targetLocalRotation, turretAimSpeed * Time.deltaTime);
 
     }
 
