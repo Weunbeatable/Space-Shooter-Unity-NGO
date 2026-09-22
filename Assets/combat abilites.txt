@@ -56,3 +56,9 @@ Different ships can have unique traits e.g. better shield attunement, bonus bomb
 
 
 add chat system. I think everything is there from the leaderboard stuff
+
+portal gun: - fire a portal forward that closes after a set time, links to the closest portal on the map.
+
+Next map mostly 3rd person with the top down controls reserved for sections of the map that are emant for top down like aboned transport
+sections that are rail like in pattern and easier to navigate but are enclosed. Will have to block the bottoms and tops of maps aka add floors
+but it should work. 

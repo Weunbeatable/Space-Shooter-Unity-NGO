@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
+using DG.Tweening;
 
 public class PlayerMovement : NetworkBehaviour
 {

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
@@ -17,7 +17,9 @@ public class PlayerAiming : NetworkBehaviour
     float yVel;
     float zVel;
     float smoothTime = 0.5f;
-    private bool useThirdPersonAiming = false; 
+    private bool useThirdPersonAiming = false;
+    public bool IsUsingGamepad;
+    private bool wasUsingGamepad;
     private Camera mainCamera;
 
     [Header("Third Person Aim")]
@@ -25,10 +27,15 @@ public class PlayerAiming : NetworkBehaviour
     [SerializeField] private float turretAimSpeed = 360f;
 
     [SerializeField] private float maxYaw = 90f;
-    [SerializeField] private float maxPitch = 45f;
+    [SerializeField] private float maxPitch = 25f;
+
+    [Header("Controller values")]
+    private Vector2 controllerAim;
+    [SerializeField] private float controllerAimSpeed = 1.5f; // will want to expose this in the menu for adjustment
 
     public override void OnNetworkSpawn()
     {
+        if(!IsOwner) return;
         PlayerMovement.OnTopDownEnter += UseTopDownAiming;
         PlayerMovement.OnThirdPersonEnter += UseThirdPersonAiming;
     }
@@ -37,6 +44,7 @@ public class PlayerAiming : NetworkBehaviour
 
     public override void OnNetworkDespawn()
     {
+        if (!IsOwner) return;
         PlayerMovement.OnTopDownEnter -= UseTopDownAiming;
         PlayerMovement.OnThirdPersonEnter -= UseThirdPersonAiming;
     }
@@ -44,7 +52,12 @@ public class PlayerAiming : NetworkBehaviour
     {
         if (!IsOwner)
             return;
-
+        bool usingGamepad = inputReader.IsUsingGamepad;
+        if(usingGamepad && !wasUsingGamepad)
+        {
+            SyncControllerAimToMouse();
+        }
+        wasUsingGamepad = usingGamepad;
         // ensure right camera is grabbed
         if (mainCamera == null)
         {
@@ -52,81 +65,142 @@ public class PlayerAiming : NetworkBehaviour
 
             if (mainCamera == null) return;
         }
-        if(useThirdPersonAiming == false)
-        TopDownAimControls();
-
-        if (useThirdPersonAiming == true)
+        if (useThirdPersonAiming == false)
         {
-            ThirdPersonAimControl();
+            if (inputReader.IsUsingGamepad)
+            {
+                TopDownControllerAim(inputReader.ControllerAim);
+            }
+            else
+            {
+                TopDownMouseControls();
+            }
+
+        }
+        else
+        {
+            {
+
+                if (inputReader.IsUsingGamepad)
+                {
+                    ThirdPersonAimingController(inputReader.ControllerAim);
+                }
+                else
+                {
+                    ThirdPersonAimControlMouse();
+                }
+            }
         }
     }
-
-    private void ThirdPersonAimControl()
+    private void applyNormalizedThirdPersonAim(Vector2 normalizedAim)
     {
+        float yaw = normalizedAim.x * maxYaw;
 
+        float pitch = -normalizedAim.y * maxPitch;
+        Quaternion targetRotation = Quaternion.Euler(pitch, yaw, 0f);
+
+        turretTransform.localRotation = Quaternion.RotateTowards(turretTransform.localRotation, targetRotation, turretAimSpeed * Time.deltaTime);
+    }
+    private void ThirdPersonAimControlMouse()
+    {
+        /*
+         * goal
+         * center of screen = turret faces straight ahead,
+            left edge = about -90° yaw,
+            right edge = about +90° yaw,
+            upper/lower screen = controlled pitch,
+            turret never aims behind the ship.
+        */
         Vector2 mousePosition = inputReader.AimPosition;
 
-        Ray mouseRay = mainCamera.ScreenPointToRay(mousePosition);
+        Vector2 viewport =
+         mainCamera.ScreenToViewportPoint(mousePosition);
 
-        // put a  plane in front of the ship and turret irregardless of wolrd rotation
-        // this goes back to an earlier solution, the math was just wrong with the plane
-        // corrective math was found in chat after other failed attempts that can be seen in past commits. 
-        Vector3 planePosition = turretMount.position + turretMount.forward * thirdPersonAimDistance;
+        //convert 0 - 1 screen coordinates to -1 - 1
+        // store it in a vector to pass to normalization function
+        Vector2 normalizedAim = new Vector2(
+        (viewport.x - 0.5f) * 2f,
+        (viewport.y - 0.5f) * 2f);
 
-        Plane aimingPlane = new Plane(turretMount.forward, planePosition);
-
-        if(!aimingPlane.Raycast(mouseRay, out float distance)) { return; } // dont calculate if ray doesn't hit anything. 
-
-        Vector3 targetWorldPosition = mouseRay.GetPoint(distance); // figure out where the ray hits to find intersection 
-        
-        Vector3 worldDirection = (targetWorldPosition - turretMount.position).normalized; // figure out direction to face by subtracting and normalizing vectors
-
-        // convert world direction to turrets local space. 
-        Vector3 localDirection = turretMount.InverseTransformDirection(worldDirection);
-
-        float yaw = Mathf.Atan2(localDirection.x, localDirection.z) * Mathf.Rad2Deg; 
-
-        float horizontalDistance = Mathf.Sqrt(localDirection.x * localDirection.x+localDirection.z * localDirection.z);
-
-        float pitch = -Mathf.Atan2(localDirection.y, horizontalDistance) * Mathf.Rad2Deg; // - value to account for mouse input and facing direction of mount
-
-        // lock turret facing to only front view
-        yaw = Mathf.Clamp(yaw, -maxYaw, maxYaw);
-
-        pitch = Mathf.Clamp(pitch, -maxPitch, maxPitch);
-
-        Quaternion targetLocalRotation = Quaternion.Euler(-pitch, yaw, 0f);
-
-        turretTransform.localRotation = Quaternion.RotateTowards(turretTransform.localRotation, targetLocalRotation, turretAimSpeed * Time.deltaTime);
+        applyNormalizedThirdPersonAim(normalizedAim);
 
     }
 
-    private void TopDownAimControls()
+    private void UpdateControllerAim(Vector2 controlStickInputs)
+    {
+        const float deadZone = 0.1f; // account for controller offset
+
+        if (controlStickInputs.magnitude < deadZone)
+        {
+            controlStickInputs = Vector2.zero;
+        }
+
+        controllerAim += (controlStickInputs) * controllerAimSpeed * Time.deltaTime ;
+
+        controllerAim.x = Mathf.Clamp(controllerAim.x, -1f, 1f); // set boundaries for how far left and right inputs can be read at
+        controllerAim.y = Mathf.Clamp(controllerAim.y, -1f, 1f);
+    }
+
+    private void ThirdPersonAimingController(Vector2 stickInput)
+    {
+        UpdateControllerAim(stickInput);
+        applyNormalizedThirdPersonAim(controllerAim);
+    }
+
+
+    private void TopDownMouseControls()
     {
         Vector2 mousePosition = inputReader.AimPosition;
 
-        Ray mouseRay =
-            mainCamera.ScreenPointToRay(mousePosition);
+        Ray aimRay = mainCamera.ScreenPointToRay(mousePosition);
 
+        applyTopDownRay(aimRay);
+    }
+    private void TopDownControllerAim(Vector2 stickInput)
+    {
+        UpdateControllerAim(stickInput);
+
+        Vector2 viewPort = ControllerAimToViewport();
+
+        Ray aimRay = mainCamera.ViewportPointToRay(new Vector3(viewPort.x, viewPort.y, 0f));
+
+        applyTopDownRay(aimRay);
+    }
+
+    private void applyTopDownRay(Ray aimRay)
+    {
+        // same logic for the mouse for creating a ray to allow for proper aiming but reapplied to work for controller as well
         Plane groundPlane =
             new Plane(Vector3.up, turretTransform.position);
 
-        if (groundPlane.Raycast(mouseRay, out float distance))
+        if (!groundPlane.Raycast(aimRay, out float distance)) { return; }
+
+        Vector3 targetPosition = aimRay.GetPoint(distance);
+
+        Vector3 aimDirection = targetPosition - turretTransform.position;
+        aimDirection.y = 0f;
+
+        if(aimDirection.sqrMagnitude > Mathf.Epsilon)
         {
-            Vector3 targetPosition =
-                mouseRay.GetPoint(distance);
-
-            Vector3 aimDirection =
-                targetPosition - turretTransform.position;
-
-            aimDirection.y = 0f;
-
-            if (aimDirection.sqrMagnitude > Mathf.Epsilon)
-            {
-                turretTransform.forward =
-                    aimDirection.normalized;
-            }
+            // some input was registered so set the forward of the turret
+            turretTransform.forward = aimDirection.normalized;
         }
+    }
+
+    private Vector2 ControllerAimToViewport()
+    {
+        // topdown conversion for viewport coordinates
+        return new Vector2((controllerAim.x + 1f) * 0.5f,
+            (controllerAim.y + 1f) * 0.5f);
+    }
+
+    // prevent aim change feeling drastic if changing inputs 
+    private void SyncControllerAimToMouse()
+    {
+        Vector2 viewport = mainCamera.ScreenToViewportPoint(inputReader.AimPosition);
+        controllerAim = new Vector2(
+            (viewport.x - 0.5f) * 2f,
+            (viewport.y - 0.5f) * 2f);
     }
 
     private void UseTopDownAiming()
@@ -138,4 +212,31 @@ public class PlayerAiming : NetworkBehaviour
     {
         useThirdPersonAiming = true; 
     }
+
+    /* virtual mouse for contorller visual 
+ * (-1,+1) -------- (+1,+1)
+    |                |
+    |      (0,0)     |
+    |                |
+(-1,-1) -------- (+1,-1)
+
+               INPUT
+                      │
+             ┌────────┴────────┐
+             │                 │
+           Mouse           Controller
+             │                 │
+      absolute pixels       stick delta
+             │                 │
+             │          virtual cursor
+             │                 │
+             └────────┬────────┘
+                      ↓
+                 normalized aim
+                      │
+          ┌───────────┴───────────┐
+          ↓                       ↓
+   Third-person aim          Top-down ray
+   yaw / pitch              world position
+*/
 }

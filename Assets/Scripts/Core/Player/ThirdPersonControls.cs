@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
 using System;
-
+using DG.Tweening;
 
 public class ThirdPersonControls : NetworkBehaviour
 {
@@ -36,6 +36,11 @@ public class ThirdPersonControls : NetworkBehaviour
     [SerializeField] private float visualRotationSpeed = 6f;
     [SerializeField] private ParticleSystem boostVisual;
 
+
+    [SerializeField] private Vector3 spinDirection; 
+    private bool isSpinning;
+    private float spinSpeed;
+
     private Quaternion startingVisualRotation; 
 
     [Header("Controls activation status")]
@@ -50,9 +55,10 @@ public class ThirdPersonControls : NetworkBehaviour
         inputReader.BoostFireEvent += BoostForward;
         PlayerMovement.OnThirdPersonEnter += ActivateControls;
         PlayerMovement.OnTopDownEnter += DeactivateControls;
+        inputReader.SpinEvent += ActivateSpin;
     }
 
-   
+
 
     public override void OnNetworkDespawn()
     {
@@ -78,6 +84,7 @@ public class ThirdPersonControls : NetworkBehaviour
 
     private void ProcessRotation()
     {
+        if (isSpinning) { return; }
         // start ship from its current facing direction THEN rotate it until user inputs values
         float yaw = previousMovementInput.x * yawRate * Time.fixedDeltaTime;
         float pitch = -previousMovementInput.y * pitchRate * Time.fixedDeltaTime;
@@ -103,15 +110,11 @@ public class ThirdPersonControls : NetworkBehaviour
     private void ProcessTranslation()
     {
 
-        float xOffset = previousMovementInput.x * Time.deltaTime * controlSpeed;
-        float yOffset = previousMovementInput.y * Time.deltaTime * controlSpeed;
-
-
-        float rawXPos = playerBody.position.x + xOffset;
-        float rawYPos = playerBody.position.y + yOffset;
-
-        float clampedXPos = Mathf.Clamp(rawXPos, -xRange, xRange); // this allows us to specify how far left and right our ship can move. 
-        float clampedYPos = Mathf.Clamp(rawYPos, -yRange + 5, yRange);
+        if (isSpinning)
+        {
+            playerBody.velocity = spinDirection * spinSpeed;
+            return;
+        }
 
        // playerBody.position = new Vector3(clampedXPos, clampedYPos, playerBody.position.z);// this allows us to move the ship in 3D space hence vector3, clampedxpos restricts our left and right movement
         if(IsBoosting == true)
@@ -190,4 +193,23 @@ public class ThirdPersonControls : NetworkBehaviour
 
     }
 
+    private void ActivateSpin()
+    {
+        if(!UseControls || isSpinning) { return; }  
+        float turnValue = previousMovementInput.x >= 0 ? 1 : -1; // terinary operator to check if the spin should be right or left
+        // because movementvcetor is a float.
+        isSpinning = true;
+
+        // caching the direction the playe ris moving in during flight. 
+        spinDirection = playerBody.velocity.sqrMagnitude > 0.01f ? playerBody.velocity.normalized : playerBody.transform.forward;
+        spinSpeed = playerBody.velocity.magnitude;
+
+        if (UseControls == true && !DOTween.IsTweening(playerBody))
+        {
+            playerBody.DORotate(new Vector3(
+                0f,
+                0f,
+                360 * turnValue), .6f, RotateMode.LocalAxisAdd).SetEase(Ease.OutSine).OnComplete(() =>isSpinning = false);
+        }
+    }
 }

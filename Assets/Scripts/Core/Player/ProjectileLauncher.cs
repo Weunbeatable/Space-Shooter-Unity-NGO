@@ -27,21 +27,26 @@ public class ProjectileLauncher : NetworkBehaviour
     private bool shouldFire;
     private float timer;
     private float muzzleFlashTimer;
+    private bool useThirdPersonAiming;
     public override void OnNetworkSpawn()
     {
     
         // only subscribe to your own input
         if (!IsOwner) {  return; }
         inputReader.PrimaryFireEvent += InputReader_PrimaryFireEvent;
+        PlayerMovement.OnTopDownEnter += UseTopDownAiming;
+        PlayerMovement.OnThirdPersonEnter += UseThirdPersonAiming;
 
     }
 
-    
+
 
     public override void OnNetworkDespawn()
     {
         if (!IsOwner) { return; }
         inputReader.PrimaryFireEvent -= InputReader_PrimaryFireEvent;
+        PlayerMovement.OnTopDownEnter += UseTopDownAiming;
+        PlayerMovement.OnThirdPersonEnter += UseThirdPersonAiming;
     }
     // Update is called once per frame
     void Update()
@@ -68,10 +73,18 @@ public class ProjectileLauncher : NetworkBehaviour
         if(wallet.TotalCoins.Value < costToFire) { return; }
 
         Vector3 spawnPosition = ProjectileSpawnPoint.position;
-
-        Vector3 fireDirection = ProjectileSpawnPoint.forward;
-        fireDirection.y = 0f;
-        fireDirection.Normalize();
+        Vector3 fireDirection;
+        if (useThirdPersonAiming == true) 
+        {
+             fireDirection = ProjectileSpawnPoint.forward.normalized;
+        }
+        else
+        {
+            fireDirection = ProjectileSpawnPoint.forward;
+            fireDirection.y = 0f;
+            fireDirection.Normalize();
+        }
+        
         // make sure server rpc getting same data so everyone can see projectile
         PrimaryFireServerRpc(spawnPosition, fireDirection);
         SpawnDummyProjectile(spawnPosition, fireDirection);
@@ -161,6 +174,14 @@ public class ProjectileLauncher : NetworkBehaviour
             rb.velocity = direction.normalized * projectileSpeed;
         }
     }
+    private void UseThirdPersonAiming()
+    {
+        useThirdPersonAiming = true;
+    }
 
-  
+    private void UseTopDownAiming()
+    {
+        useThirdPersonAiming = false;
+    }
+
 }

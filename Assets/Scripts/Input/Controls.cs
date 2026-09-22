@@ -55,6 +55,15 @@ public partial class @Controls: IInputActionCollection2, IDisposable
                     ""initialStateCheck"": true
                 },
                 {
+                    ""name"": ""AimController"",
+                    ""type"": ""Value"",
+                    ""id"": ""583316ec-c50c-45f6-8e03-b425f1bd8133"",
+                    ""expectedControlType"": ""Vector2"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true
+                },
+                {
                     ""name"": ""Change Altitude"",
                     ""type"": ""Button"",
                     ""id"": ""c416d38e-25a9-4649-a4aa-c9bccc141640"",
@@ -76,6 +85,24 @@ public partial class @Controls: IInputActionCollection2, IDisposable
                     ""name"": ""Boost"",
                     ""type"": ""Button"",
                     ""id"": ""ae8fbc32-2ef5-4a07-b652-319fa57f70c7"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Map"",
+                    ""type"": ""Button"",
+                    ""id"": ""637ad95f-ce84-4777-a711-d06d6ec5fc7f"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""BarrelRollSpin"",
+                    ""type"": ""Button"",
+                    ""id"": ""455ba641-fafc-444d-b780-c1278ec07f8f"",
                     ""expectedControlType"": ""Button"",
                     ""processors"": """",
                     ""interactions"": """",
@@ -283,17 +310,6 @@ public partial class @Controls: IInputActionCollection2, IDisposable
                 },
                 {
                     ""name"": """",
-                    ""id"": ""875ad1df-2663-4efa-937b-29d0f128631a"",
-                    ""path"": ""<Gamepad>/rightStick"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": ""Controller"",
-                    ""action"": ""Aim"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
                     ""id"": ""a6f83241-b10e-44fe-918e-b8933655130e"",
                     ""path"": ""<Keyboard>/leftShift"",
                     ""interactions"": """",
@@ -350,11 +366,77 @@ public partial class @Controls: IInputActionCollection2, IDisposable
                 {
                     ""name"": """",
                     ""id"": ""eca88d68-df5f-481c-9689-1133d3087f52"",
-                    ""path"": ""<Gamepad>/buttonSouth"",
+                    ""path"": ""<DualShockGamepad>/leftStickPress"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": ""Controller"",
                     ""action"": ""Boost"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""396004e1-a39d-4652-980a-bdc7d4a9ba85"",
+                    ""path"": ""<Gamepad>/leftShoulder"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Boost"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""138725a0-23a6-4415-8fd5-d581ffd12cd8"",
+                    ""path"": ""<Gamepad>/rightStick"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Controller"",
+                    ""action"": ""AimController"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""a7f4db12-2d7e-433a-a00e-0bca6f49efe9"",
+                    ""path"": ""<Keyboard>/tab"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Mouse&Key"",
+                    ""action"": ""Map"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""7b9cd7d4-e1bc-4d39-b0e2-8cde0ec433db"",
+                    ""path"": ""<Gamepad>/select"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Controller"",
+                    ""action"": ""Map"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""92e180de-b294-4f88-a552-7338640ca836"",
+                    ""path"": ""<Keyboard>/q"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Mouse&Key"",
+                    ""action"": ""BarrelRollSpin"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""c21a290f-dca1-4c52-8681-291600ab5a6b"",
+                    ""path"": ""<Gamepad>/leftTrigger"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Controller"",
+                    ""action"": ""BarrelRollSpin"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -406,9 +488,12 @@ public partial class @Controls: IInputActionCollection2, IDisposable
         m_Player_Move = m_Player.FindAction("Move", throwIfNotFound: true);
         m_Player_PrimaryFire = m_Player.FindAction("Primary Fire", throwIfNotFound: true);
         m_Player_Aim = m_Player.FindAction("Aim", throwIfNotFound: true);
+        m_Player_AimController = m_Player.FindAction("AimController", throwIfNotFound: true);
         m_Player_ChangeAltitude = m_Player.FindAction("Change Altitude", throwIfNotFound: true);
         m_Player_UseAbility = m_Player.FindAction("Use Ability", throwIfNotFound: true);
         m_Player_Boost = m_Player.FindAction("Boost", throwIfNotFound: true);
+        m_Player_Map = m_Player.FindAction("Map", throwIfNotFound: true);
+        m_Player_BarrelRollSpin = m_Player.FindAction("BarrelRollSpin", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -473,9 +558,12 @@ public partial class @Controls: IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_Move;
     private readonly InputAction m_Player_PrimaryFire;
     private readonly InputAction m_Player_Aim;
+    private readonly InputAction m_Player_AimController;
     private readonly InputAction m_Player_ChangeAltitude;
     private readonly InputAction m_Player_UseAbility;
     private readonly InputAction m_Player_Boost;
+    private readonly InputAction m_Player_Map;
+    private readonly InputAction m_Player_BarrelRollSpin;
     public struct PlayerActions
     {
         private @Controls m_Wrapper;
@@ -483,9 +571,12 @@ public partial class @Controls: IInputActionCollection2, IDisposable
         public InputAction @Move => m_Wrapper.m_Player_Move;
         public InputAction @PrimaryFire => m_Wrapper.m_Player_PrimaryFire;
         public InputAction @Aim => m_Wrapper.m_Player_Aim;
+        public InputAction @AimController => m_Wrapper.m_Player_AimController;
         public InputAction @ChangeAltitude => m_Wrapper.m_Player_ChangeAltitude;
         public InputAction @UseAbility => m_Wrapper.m_Player_UseAbility;
         public InputAction @Boost => m_Wrapper.m_Player_Boost;
+        public InputAction @Map => m_Wrapper.m_Player_Map;
+        public InputAction @BarrelRollSpin => m_Wrapper.m_Player_BarrelRollSpin;
         public InputActionMap Get() { return m_Wrapper.m_Player; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -504,6 +595,9 @@ public partial class @Controls: IInputActionCollection2, IDisposable
             @Aim.started += instance.OnAim;
             @Aim.performed += instance.OnAim;
             @Aim.canceled += instance.OnAim;
+            @AimController.started += instance.OnAimController;
+            @AimController.performed += instance.OnAimController;
+            @AimController.canceled += instance.OnAimController;
             @ChangeAltitude.started += instance.OnChangeAltitude;
             @ChangeAltitude.performed += instance.OnChangeAltitude;
             @ChangeAltitude.canceled += instance.OnChangeAltitude;
@@ -513,6 +607,12 @@ public partial class @Controls: IInputActionCollection2, IDisposable
             @Boost.started += instance.OnBoost;
             @Boost.performed += instance.OnBoost;
             @Boost.canceled += instance.OnBoost;
+            @Map.started += instance.OnMap;
+            @Map.performed += instance.OnMap;
+            @Map.canceled += instance.OnMap;
+            @BarrelRollSpin.started += instance.OnBarrelRollSpin;
+            @BarrelRollSpin.performed += instance.OnBarrelRollSpin;
+            @BarrelRollSpin.canceled += instance.OnBarrelRollSpin;
         }
 
         private void UnregisterCallbacks(IPlayerActions instance)
@@ -526,6 +626,9 @@ public partial class @Controls: IInputActionCollection2, IDisposable
             @Aim.started -= instance.OnAim;
             @Aim.performed -= instance.OnAim;
             @Aim.canceled -= instance.OnAim;
+            @AimController.started -= instance.OnAimController;
+            @AimController.performed -= instance.OnAimController;
+            @AimController.canceled -= instance.OnAimController;
             @ChangeAltitude.started -= instance.OnChangeAltitude;
             @ChangeAltitude.performed -= instance.OnChangeAltitude;
             @ChangeAltitude.canceled -= instance.OnChangeAltitude;
@@ -535,6 +638,12 @@ public partial class @Controls: IInputActionCollection2, IDisposable
             @Boost.started -= instance.OnBoost;
             @Boost.performed -= instance.OnBoost;
             @Boost.canceled -= instance.OnBoost;
+            @Map.started -= instance.OnMap;
+            @Map.performed -= instance.OnMap;
+            @Map.canceled -= instance.OnMap;
+            @BarrelRollSpin.started -= instance.OnBarrelRollSpin;
+            @BarrelRollSpin.performed -= instance.OnBarrelRollSpin;
+            @BarrelRollSpin.canceled -= instance.OnBarrelRollSpin;
         }
 
         public void RemoveCallbacks(IPlayerActions instance)
@@ -575,8 +684,11 @@ public partial class @Controls: IInputActionCollection2, IDisposable
         void OnMove(InputAction.CallbackContext context);
         void OnPrimaryFire(InputAction.CallbackContext context);
         void OnAim(InputAction.CallbackContext context);
+        void OnAimController(InputAction.CallbackContext context);
         void OnChangeAltitude(InputAction.CallbackContext context);
         void OnUseAbility(InputAction.CallbackContext context);
         void OnBoost(InputAction.CallbackContext context);
+        void OnMap(InputAction.CallbackContext context);
+        void OnBarrelRollSpin(InputAction.CallbackContext context);
     }
 }
