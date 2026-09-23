@@ -28,6 +28,8 @@ public class ProjectileLauncher : NetworkBehaviour
     private float timer;
     private float muzzleFlashTimer;
     private bool useThirdPersonAiming;
+    private bool isSpinning;
+    private float spinDuration; 
     public override void OnNetworkSpawn()
     {
     
@@ -36,10 +38,11 @@ public class ProjectileLauncher : NetworkBehaviour
         inputReader.PrimaryFireEvent += InputReader_PrimaryFireEvent;
         PlayerMovement.OnTopDownEnter += UseTopDownAiming;
         PlayerMovement.OnThirdPersonEnter += UseThirdPersonAiming;
+        inputReader.SpinEvent += ActivateSpin;
 
     }
 
-
+   
 
     public override void OnNetworkDespawn()
     {
@@ -47,6 +50,7 @@ public class ProjectileLauncher : NetworkBehaviour
         inputReader.PrimaryFireEvent -= InputReader_PrimaryFireEvent;
         PlayerMovement.OnTopDownEnter += UseTopDownAiming;
         PlayerMovement.OnThirdPersonEnter += UseThirdPersonAiming;
+        inputReader.SpinEvent -= ActivateSpin;
     }
     // Update is called once per frame
     void Update()
@@ -60,6 +64,12 @@ public class ProjectileLauncher : NetworkBehaviour
             }
         }
         if (!IsOwner) { return; }
+        if (spinDuration <= 0)
+        {
+            isSpinning = false;
+            spinDuration = 0f;
+        }
+        spinDuration -= Time.deltaTime;
         if (timer > 0f)
         {
             timer -= Time.deltaTime;
@@ -67,7 +77,7 @@ public class ProjectileLauncher : NetworkBehaviour
         if (!shouldFire) {return; }
 
         // figure out when allowed to fire
-        if(timer > 0) { return; }
+        if(timer > 0 || isSpinning == true) { return; }
 
         // enough to fire
         if(wallet.TotalCoins.Value < costToFire) { return; }
@@ -182,6 +192,16 @@ public class ProjectileLauncher : NetworkBehaviour
     private void UseTopDownAiming()
     {
         useThirdPersonAiming = false;
+    }
+
+    private void ActivateSpin()
+    {
+        if (!IsOwner) { return; }
+        isSpinning = true;
+        if (this.gameObject.TryGetComponent<ThirdPersonControls>(out ThirdPersonControls ship))
+        {
+            spinDuration = ship.GetSpinDuration();
+        }
     }
 
 }

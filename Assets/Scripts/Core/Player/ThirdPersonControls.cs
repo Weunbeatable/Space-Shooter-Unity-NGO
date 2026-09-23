@@ -4,6 +4,8 @@ using UnityEngine;
 using Unity.Netcode;
 using System;
 using DG.Tweening;
+using UnityEngine.InputSystem;
+
 
 public class ThirdPersonControls : NetworkBehaviour
 {
@@ -36,10 +38,21 @@ public class ThirdPersonControls : NetworkBehaviour
     [SerializeField] private float visualRotationSpeed = 6f;
     [SerializeField] private ParticleSystem boostVisual;
 
-
-    [SerializeField] private Vector3 spinDirection; 
+    [Header("ship flight spin settings")]
     private bool isSpinning;
-    private float spinSpeed;
+    private Quaternion flightRotation;
+    private float spinRollAngle;
+    private Tween spinTween;
+
+    [Header("Spin direction settings")]
+    private Vector3 spinRightDirection;
+
+    private float spinLateralAmount;
+    private float spinProgress;
+    private float spinBaseLateralVelocity;
+
+    [SerializeField] private float spinDodgeSpeed = 20f;
+    [SerializeField] private float spinDuration = 0.6f; 
 
     private Quaternion startingVisualRotation; 
 
@@ -68,6 +81,7 @@ public class ThirdPersonControls : NetworkBehaviour
         inputReader.BoostFireEvent -= BoostForward;
         PlayerMovement.OnThirdPersonEnter -= ActivateControls;
         PlayerMovement.OnTopDownEnter -= DeactivateControls;
+        inputReader.SpinEvent -= ActivateSpin;
     }
     void Update()
     {
@@ -84,14 +98,19 @@ public class ThirdPersonControls : NetworkBehaviour
 
     private void ProcessRotation()
     {
-        if (isSpinning) { return; }
-        // start ship from its current facing direction THEN rotate it until user inputs values
-        float yaw = previousMovementInput.x * yawRate * Time.fixedDeltaTime;
-        float pitch = -previousMovementInput.y * pitchRate * Time.fixedDeltaTime;
+        if (!isSpinning)
+        {
+            // start ship from its current facing direction THEN rotate it until user inputs values
+            float yaw = previousMovementInput.x * yawRate * Time.fixedDeltaTime;
+            float pitch = -previousMovementInput.y * pitchRate * Time.fixedDeltaTime;
 
-        Quaternion rotationDelta = Quaternion.Euler(pitch, yaw, 0f);
+            Quaternion rotationDelta = Quaternion.Euler(pitch, yaw, 0f);
 
-        playerBody.MoveRotation(playerBody.rotation * rotationDelta);
+            flightRotation = Quaternion.Normalize(flightRotation * rotationDelta);
+        }
+        Quaternion rollRotation = Quaternion.AngleAxis(spinRollAngle, Vector3.forward);
+        Quaternion finalRotation = flightRotation * rollRotation;
+        playerBody.MoveRotation(finalRotation);
     }
 
     private void ProcessVisualRotation()
@@ -112,24 +131,41 @@ public class ThirdPersonControls : NetworkBehaviour
 
         if (isSpinning)
         {
-            playerBody.velocity = spinDirection * spinSpeed;
+            // track the spin progress 
+            spinProgress += Time.fixedDeltaTime / spinDuration;
+
+            spinProgress = Mathf.Clamp01(spinProgress);
+
+            float lateralCurve = Mathf.Sin(spinProgress * Mathf.PI);
+
+            float desitredExtraLateralVelocity = spinLateralAmount * spinDodgeSpeed * lateralCurve;
+
+            float desiredLateralVelocity = spinBaseLateralVelocity + desitredExtraLateralVelocity;
+
+            // use dot product to find out current lateral velocity
+            float currentLateralVelocity =
+                Vector3.Dot(playerBody.velocity, spinRightDirection);
+
+            // take the right left/ right component
+
+            float lateralVelocityChange = desiredLateralVelocity - currentLateralVelocity;
+
+            playerBody.AddForce(spinRightDirection * lateralVelocityChange, ForceMode.VelocityChange);
             return;
         }
 
+
        // playerBody.position = new Vector3(clampedXPos, clampedYPos, playerBody.position.z);// this allows us to move the ship in 3D space hence vector3, clampedxpos restricts our left and right movement
-        if(IsBoosting == true)
+        if(IsBoosting)
         {
 
             playerBody.velocity = playerBody.transform.forward  *ThrustValue;
         }
-        else
-        {
-            if(playerBody.velocity.magnitude > 0.1f) // as long as i'm still moving add a break force
+        else if(playerBody.velocity.magnitude > 0.1f) // as long as i'm still moving add a break force
             {
                 Vector3 brakeForce = -playerBody.velocity.normalized;
                 playerBody.AddForce(brakeForce * BrakeValue, ForceMode.Force);
             }
-        }
     }
 
     private void HandleMove(Vector2 movementInput)
@@ -152,6 +188,10 @@ public class ThirdPersonControls : NetworkBehaviour
         // in and out of the third person field 
         previousMovementInput = Vector3.zero;
         IsBoosting = false;
+
+        flightRotation = playerBody.rotation;
+
+        spinRollAngle = 0f;
 
         //playerBody.velocity = Vector3.zero;
        // playerBody.angularVelocity = Vector3.zero;
@@ -195,21 +235,47 @@ public class ThirdPersonControls : NetworkBehaviour
 
     private void ActivateSpin()
     {
-        if(!UseControls || isSpinning) { return; }  
-        float turnValue = previousMovementInput.x >= 0 ? 1 : -1; // terinary operator to check if the spin should be right or left
-        // because movementvcetor is a float.
+        if(!UseControls || isSpinning) { return; }
+
+        Vector2 spinInput = Vector2.ClampMagnitude(new Vector2(
+            previousMovementInput.x,
+            previousMovementInput.y), 1f);
+        float rawLateral = spinInput.x;
+
+
+        // weightier analog response. 
+        spinLateralAmount = Mathf.Sign(rawLateral) * Mathf.Pow(Mathf.Abs(rawLateral), 0.65f);
+
+        // get stable ship=relative right direction
+        spinRightDirection = flightRotation * Vector3.right;
+
+        // get current speed along left/right axis
+        spinBaseLateralVelocity =  Vector3.Dot(playerBody.velocity, spinRightDirection);
+
+        spinProgress = 0f;
+        spinRollAngle = 0f;
+        float turnValue;
+
+        if (Mathf.Abs(spinLateralAmount) > 0.1f)
+        {
+            turnValue = Mathf.Sign(spinLateralAmount);
+        }
+        else
+        {
+            // no horizontal input doesn't atter roll direction
+            turnValue = 1f;
+        }
+
+
         isSpinning = true;
 
-        // caching the direction the playe ris moving in during flight. 
-        spinDirection = playerBody.velocity.sqrMagnitude > 0.01f ? playerBody.velocity.normalized : playerBody.transform.forward;
-        spinSpeed = playerBody.velocity.magnitude;
+        spinTween = DOTween.To(() =>spinRollAngle, value => spinRollAngle = value, 
+            360f * turnValue, spinDuration).SetEase(Ease.OutSine).SetUpdate(UpdateType.Fixed).OnComplete(()  =>{ spinRollAngle = 0f; spinProgress = 0f; isSpinning = false; IsBoosting = true; });
 
-        if (UseControls == true && !DOTween.IsTweening(playerBody))
-        {
-            playerBody.DORotate(new Vector3(
-                0f,
-                0f,
-                360 * turnValue), .6f, RotateMode.LocalAxisAdd).SetEase(Ease.OutSine).OnComplete(() =>isSpinning = false);
-        }
+        
     }
+
+
+
+    public float GetSpinDuration() => spinDuration;
 }

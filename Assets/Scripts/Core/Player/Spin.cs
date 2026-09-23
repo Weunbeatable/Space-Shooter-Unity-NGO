@@ -9,12 +9,29 @@ using System;
 public class Spin : NetworkBehaviour
 {
     [SerializeField] InputReader input;
+    [SerializeField] CapsuleCollider spinCollider;
+    [SerializeField] ParticleSystem spinParticles;
+    [SerializeField] AudioSource spinAudio;
+
+    private float activationDuration;
+    [Range(0f, 1f)]
+    private float clipEffectRange;
 
     public override void OnNetworkSpawn()
     {
         if (!IsOwner) { return; }
 
         input.SpinEvent += ActivateSpin;
+    }
+
+    private void Update()
+    {
+        if (activationDuration <= 0)
+        {
+            spinCollider.enabled = false;
+            return;
+        }
+        activationDuration -= Time.deltaTime;
     }
 
     public override void OnNetworkDespawn()
@@ -25,7 +42,19 @@ public class Spin : NetworkBehaviour
     private void ActivateSpin()
     {
         if (!IsOwner) { return; }
+        spinAudio.pitch = UnityEngine.Random.Range(0.5f, 1f);
+        spinAudio.PlayOneShot(spinAudio.clip);
+        spinParticles.Play();
+        spinCollider.enabled = true;
+        if(this.gameObject.TryGetComponent<ThirdPersonControls>(out ThirdPersonControls ship))
+        {
+            activationDuration = ship.GetSpinDuration();
+        }
+    }
 
-       // this.gameObject.GetComponent<PlayerCameraSettings>();
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (IsOwner) { return; }
     }
 }

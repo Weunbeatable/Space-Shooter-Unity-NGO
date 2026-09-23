@@ -26,7 +26,8 @@ public class PlayerMovement : NetworkBehaviour
     [Tooltip("Adjust this property to change how fast the ship will change altitude")]
     [SerializeField] private float altitudespeedChangeRate = .15f; // subject to change 
 
-    [SerializeField] private bool UseControls = true; 
+    [SerializeField] private bool UseControls = true;
+    private bool isSpinning;
 
     Vector3 previousMovementInput;
     
@@ -38,6 +39,7 @@ public class PlayerMovement : NetworkBehaviour
      
         inputReader.MoveEvent += HandleMove;
         inputReader.ChangeAltitudeEvent += ChangeAltitude;
+        inputReader.SpinEvent += ActivateSpin;
     }
 
     public override void OnNetworkDespawn()
@@ -45,7 +47,11 @@ public class PlayerMovement : NetworkBehaviour
        if (!IsOwner) return;
         inputReader.MoveEvent -= HandleMove;
         inputReader.ChangeAltitudeEvent -= ChangeAltitude;
+        inputReader.SpinEvent -= ActivateSpin;
     }
+
+  
+
     void Update()
     {
         if (!IsOwner) return;
@@ -156,4 +162,17 @@ public class PlayerMovement : NetworkBehaviour
         playerBody.position = resetPosotion;
     }
 
+    private void ActivateSpin()
+    {
+         if(!UseControls || isSpinning) { return; } 
+         
+        if (UseControls == true && !DOTween.IsTweening(playerBody))
+        {
+            isSpinning = true;
+            bodyTransform.DOLocalRotate(new Vector3(
+                0f,
+                0f,
+                360f ), .6f, RotateMode.LocalAxisAdd).SetEase(Ease.OutSine).OnComplete(() => isSpinning = false);
+        }
+    }
 }
