@@ -28,7 +28,7 @@ public class Spin : NetworkBehaviour
     {
         if (activationDuration <= 0)
         {
-            spinCollider.enabled = false;
+            spinCollider.gameObject.SetActive(false);
             return;
         }
         activationDuration -= Time.deltaTime;
@@ -45,7 +45,7 @@ public class Spin : NetworkBehaviour
         spinAudio.pitch = UnityEngine.Random.Range(0.5f, 1f);
         spinAudio.PlayOneShot(spinAudio.clip);
         spinParticles.Play();
-        spinCollider.enabled = true;
+        spinCollider.gameObject.SetActive(true); 
         if(this.gameObject.TryGetComponent<ThirdPersonControls>(out ThirdPersonControls ship))
         {
             activationDuration = ship.GetSpinDuration();

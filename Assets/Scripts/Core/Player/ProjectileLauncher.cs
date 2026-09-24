@@ -86,7 +86,7 @@ public class ProjectileLauncher : NetworkBehaviour
         Vector3 fireDirection;
         if (useThirdPersonAiming == true) 
         {
-             fireDirection = ProjectileSpawnPoint.forward.normalized;
+             fireDirection = ProjectileSpawnPoint.forward;
         }
         else
         {
@@ -120,12 +120,14 @@ public class ProjectileLauncher : NetworkBehaviour
         GameObject projectileInstance = Instantiate(
             ServerProjectilePrefab,
             spawnPos,
-            Quaternion.LookRotation(direction));
+            Quaternion.LookRotation(-direction));
 
         
 
         //preventing projectile from colliding with s
         Physics.IgnoreCollision(playerCollider, projectileInstance.GetComponent<Collider>());
+
+
 
         if(projectileInstance.TryGetComponent<DealDamageOnContact>(out DealDamageOnContact dealDamage))
         {
@@ -168,7 +170,7 @@ public class ProjectileLauncher : NetworkBehaviour
         GameObject projectileInstance = Instantiate(
             ClientProjectilePrefab,
             spawnPos,
-            Quaternion.LookRotation(direction));
+            Quaternion.LookRotation(-direction));
 
         
 
@@ -203,5 +205,7 @@ public class ProjectileLauncher : NetworkBehaviour
             spinDuration = ship.GetSpinDuration();
         }
     }
+
+    public Transform GetProjectileSpawnPoint () => ProjectileSpawnPoint;
 
 }

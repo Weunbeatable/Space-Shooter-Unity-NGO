@@ -300,6 +300,16 @@ PrefabInstance:
       propertyPath: m_Name
       value: TeleportRingAlternate
       objectReference: {fileID: 0}
+    - target: {fileID: -927199367670048503, guid: b566ce7283e47f741b0fa467b5b72884,
+        type: 3}
+      propertyPath: m_TagString
+      value: Field
+      objectReference: {fileID: 0}
+    - target: {fileID: 5823559825142757249, guid: b566ce7283e47f741b0fa467b5b72884,
+        type: 3}
+      propertyPath: m_TagString
+      value: Portal
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects:
     - {fileID: -1994863666053979837, guid: b566ce7283e47f741b0fa467b5b72884, type: 3}

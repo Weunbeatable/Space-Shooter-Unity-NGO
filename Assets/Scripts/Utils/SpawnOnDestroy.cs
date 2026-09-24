@@ -8,6 +8,7 @@ public class SpawnOnDestroy : MonoBehaviour
 
     private void OnDestroy()
     {
-        Instantiate(prefab, transform.position, Quaternion.identity);
+       GameObject SmokeParticles =  Instantiate(prefab, transform.position, Quaternion.identity);
+        Destroy(SmokeParticles,1.5f);
     }
 }
