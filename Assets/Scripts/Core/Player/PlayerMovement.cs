@@ -25,8 +25,13 @@ public class PlayerMovement : NetworkBehaviour
     [SerializeField] private float[] altitudePositions = { 1.0f, -30f };
     [Tooltip("Adjust this property to change how fast the ship will change altitude")]
     [SerializeField] private float altitudespeedChangeRate = .15f; // subject to change 
+    [Tooltip("Smoothing of movement when switching velocities")]
+    [SerializeField, Min(0.01f)] private float altitudeSmoothTime = 0.5f;
+    private float altitudeVelocity;
 
     [SerializeField] private bool UseControls = true;
+    [SerializeField] float spinDuration = 0.6f;
+    [SerializeField] float spinAmmount = 360f;
     private bool isSpinning;
 
     Vector3 previousMovementInput;
@@ -69,18 +74,24 @@ public class PlayerMovement : NetworkBehaviour
         if(UseControls == false) { return; }
         playerBody.velocity = bodyTransform.forward.normalized* previousMovementInput.y * movementSpeed;
 
-        Vector3 newAltitude = playerBody.position;
-        float ypos = playerBody.velocity.y;
-        if (!didAltitudeChange)
+        float targetY = didAltitudeChange ? altitudePositions[1]: altitudePositions[0];
+        Vector3 position = playerBody.position;
+        position.y = Mathf.SmoothDamp(
+            position.y,
+            targetY, 
+            ref altitudeVelocity,
+            altitudeSmoothTime,
+            Mathf.Infinity,
+            Time.fixedDeltaTime);
+       
+        // finish at specified height when motion is done 
+        if(Mathf.Abs(position.y - targetY) < 0.01f &&
+            Mathf.Abs(altitudeVelocity) < 0.05f)
         {
-            newAltitude.y = altitudePositions[0];
-            playerBody.position = Vector3.Lerp(playerBody.position, newAltitude, altitudespeedChangeRate * Time.deltaTime);
+            position.y = targetY;
+            altitudeVelocity = 0f;
         }
-        else
-        {
-            newAltitude.y = altitudePositions[1];
-            playerBody.position = Vector3.Lerp(playerBody.position, newAltitude, altitudespeedChangeRate * Time.deltaTime);
-        } 
+        playerBody.position = position;
     }
     private void HandleMove(Vector2 movementInput)
     {
@@ -172,7 +183,7 @@ public class PlayerMovement : NetworkBehaviour
             bodyTransform.DOLocalRotate(new Vector3(
                 0f,
                 0f,
-                360f ), .6f, RotateMode.LocalAxisAdd).SetEase(Ease.OutSine).OnComplete(() => isSpinning = false);
+                spinAmmount ), spinDuration, RotateMode.LocalAxisAdd).SetEase(Ease.OutSine).OnComplete(() => isSpinning = false);
         }
     }
 }

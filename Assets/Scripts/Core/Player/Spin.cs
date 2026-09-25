@@ -12,7 +12,7 @@ public class Spin : NetworkBehaviour
     [SerializeField] CapsuleCollider spinCollider;
     [SerializeField] ParticleSystem spinParticles;
     [SerializeField] AudioSource spinAudio;
-
+    [SerializeField] float spinParticleDuration;
     private float activationDuration;
     [Range(0f, 1f)]
     private float clipEffectRange;
@@ -44,6 +44,9 @@ public class Spin : NetworkBehaviour
         if (!IsOwner) { return; }
         spinAudio.pitch = UnityEngine.Random.Range(0.5f, 1f);
         spinAudio.PlayOneShot(spinAudio.clip);
+        //TODO: expose this duration setting later on
+       // var main = spinParticles.main;
+       // main.duration = spinParticleDuration;
         spinParticles.Play();
         spinCollider.gameObject.SetActive(true); 
         if(this.gameObject.TryGetComponent<ThirdPersonControls>(out ThirdPersonControls ship))

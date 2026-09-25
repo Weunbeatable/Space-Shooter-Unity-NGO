@@ -29,7 +29,7 @@ public class DealDamageOnContact : MonoBehaviour
                 }
             }
 
-            if(other.attachedRigidbody.TryGetComponent<Health>(out Health health));
+            if(other.attachedRigidbody.TryGetComponent<Health>(out Health health))
             {
                 health.TakeDamage(damage);
             }

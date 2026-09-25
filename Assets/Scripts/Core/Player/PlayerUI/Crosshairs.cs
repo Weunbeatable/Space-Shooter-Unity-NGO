@@ -11,6 +11,7 @@ public class Crosshairs : NetworkBehaviour
     [SerializeField] Image centerDotIcon;
     [SerializeField] Image crossHairsIcon;
     [SerializeField] InputReader inputReader;
+    [Tooltip("Set aim mask for things the crosshair should stop at e.g. damagable objects other ships environment etc.")]
     [SerializeField] LayerMask aimMask;
     [SerializeField] float maxAimDistance = 100f;
     [SerializeField] Vector3 initialScale;
