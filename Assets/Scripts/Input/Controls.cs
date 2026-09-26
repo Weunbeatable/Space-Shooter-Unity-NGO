@@ -78,7 +78,7 @@ public partial class @Controls: IInputActionCollection2, IDisposable
                     ""id"": ""8ae04d59-1db6-456c-b898-3bf7988fc350"",
                     ""expectedControlType"": ""Button"",
                     ""processors"": """",
-                    ""interactions"": ""Press,Hold,MultiTap"",
+                    ""interactions"": ""Press,SlowTap"",
                     ""initialStateCheck"": true
                 },
                 {
@@ -334,7 +334,7 @@ public partial class @Controls: IInputActionCollection2, IDisposable
                     ""name"": """",
                     ""id"": ""5f7c30ac-74ed-4789-9869-340e8745d3cf"",
                     ""path"": ""<Keyboard>/leftCtrl"",
-                    ""interactions"": """",
+                    ""interactions"": ""Hold"",
                     ""processors"": """",
                     ""groups"": ""Mouse&Key"",
                     ""action"": ""Use Ability"",
@@ -345,7 +345,7 @@ public partial class @Controls: IInputActionCollection2, IDisposable
                     ""name"": """",
                     ""id"": ""7ecaca7b-4b59-41c5-bf00-9e4b2fb55ace"",
                     ""path"": ""<Gamepad>/rightShoulder"",
-                    ""interactions"": """",
+                    ""interactions"": ""Hold"",
                     ""processors"": """",
                     ""groups"": ""Controller"",
                     ""action"": ""Use Ability"",
