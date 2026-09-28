@@ -15,6 +15,7 @@ public class InputReader : ScriptableObject, IPlayerActions
     public event Action<Vector2> MoveEvent;
     public event Action<bool> BoostFireEvent;
     public event Action<bool> MapViewEvent;
+    public event Action OnMenuEvent;
     public event Action SpinEvent;
 
     public Vector2 AimPosition {  get; private set; }
@@ -138,6 +139,14 @@ public class InputReader : ScriptableObject, IPlayerActions
         if (context.performed)
         {
             SpinEvent?.Invoke();
+        }
+    }
+
+    public void OnMenu(InputAction.CallbackContext context)
+    {
+        if (context.performed)
+        {
+            OnMenuEvent?.Invoke();
         }
     }
 }

@@ -107,6 +107,15 @@ public partial class @Controls: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Menu"",
+                    ""type"": ""Button"",
+                    ""id"": ""a6dfa096-1404-46cc-aeff-2ff64d686b99"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -439,6 +448,39 @@ public partial class @Controls: IInputActionCollection2, IDisposable
                     ""action"": ""BarrelRollSpin"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""5a424f5b-b53b-4bf3-98cb-191c573bccd3"",
+                    ""path"": ""<Keyboard>/p"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Mouse&Key"",
+                    ""action"": ""Menu"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""6d622244-161d-4c24-b571-693dab7eb084"",
+                    ""path"": ""<Keyboard>/escape"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Mouse&Key"",
+                    ""action"": ""Menu"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""27e23afc-0daa-495a-90b9-276853dec67f"",
+                    ""path"": ""<Gamepad>/start"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Controller"",
+                    ""action"": ""Menu"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -494,6 +536,7 @@ public partial class @Controls: IInputActionCollection2, IDisposable
         m_Player_Boost = m_Player.FindAction("Boost", throwIfNotFound: true);
         m_Player_Map = m_Player.FindAction("Map", throwIfNotFound: true);
         m_Player_BarrelRollSpin = m_Player.FindAction("BarrelRollSpin", throwIfNotFound: true);
+        m_Player_Menu = m_Player.FindAction("Menu", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -564,6 +607,7 @@ public partial class @Controls: IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_Boost;
     private readonly InputAction m_Player_Map;
     private readonly InputAction m_Player_BarrelRollSpin;
+    private readonly InputAction m_Player_Menu;
     public struct PlayerActions
     {
         private @Controls m_Wrapper;
@@ -577,6 +621,7 @@ public partial class @Controls: IInputActionCollection2, IDisposable
         public InputAction @Boost => m_Wrapper.m_Player_Boost;
         public InputAction @Map => m_Wrapper.m_Player_Map;
         public InputAction @BarrelRollSpin => m_Wrapper.m_Player_BarrelRollSpin;
+        public InputAction @Menu => m_Wrapper.m_Player_Menu;
         public InputActionMap Get() { return m_Wrapper.m_Player; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -613,6 +658,9 @@ public partial class @Controls: IInputActionCollection2, IDisposable
             @BarrelRollSpin.started += instance.OnBarrelRollSpin;
             @BarrelRollSpin.performed += instance.OnBarrelRollSpin;
             @BarrelRollSpin.canceled += instance.OnBarrelRollSpin;
+            @Menu.started += instance.OnMenu;
+            @Menu.performed += instance.OnMenu;
+            @Menu.canceled += instance.OnMenu;
         }
 
         private void UnregisterCallbacks(IPlayerActions instance)
@@ -644,6 +692,9 @@ public partial class @Controls: IInputActionCollection2, IDisposable
             @BarrelRollSpin.started -= instance.OnBarrelRollSpin;
             @BarrelRollSpin.performed -= instance.OnBarrelRollSpin;
             @BarrelRollSpin.canceled -= instance.OnBarrelRollSpin;
+            @Menu.started -= instance.OnMenu;
+            @Menu.performed -= instance.OnMenu;
+            @Menu.canceled -= instance.OnMenu;
         }
 
         public void RemoveCallbacks(IPlayerActions instance)
@@ -690,5 +741,6 @@ public partial class @Controls: IInputActionCollection2, IDisposable
         void OnBoost(InputAction.CallbackContext context);
         void OnMap(InputAction.CallbackContext context);
         void OnBarrelRollSpin(InputAction.CallbackContext context);
+        void OnMenu(InputAction.CallbackContext context);
     }
 }
