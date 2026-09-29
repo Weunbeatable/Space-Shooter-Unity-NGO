@@ -1,27 +1,52 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.Events;
 
 public class PlayerMenu : NetworkBehaviour
 {
+    //IN THIS SOLUTION THE ASSUMPTION THAT THE MAIN MENU PANEL IS ALWAYS THE FIRST INDEX IS IMPORTANT FOR THE REST OF THE LOGIC TO RUN
     [SerializeField] InputReader inputReader;
+    [SerializeField] GameObject playerReference;
+    [SerializeField] GameObject mainMenuCanvas;
     [SerializeField] GameObject MainMenu;
     [SerializeField] GameObject HowToPlayMenu;
     [SerializeField] GameObject SettingsMenu;
-    // Start is called before the first frame update
+
+    private bool MenuState;
+    private bool isMainMenuOpen;
+    [SerializeField] private string ControlPanelName;
+
+
+    [Header("Device Layouts")]
+    // intent is to have only 2 panels for each layout
+    [SerializeField] GameObject gamePadPanelContainer;
+    [SerializeField] GameObject keyboardPanelContainer;
+    [SerializeField] GameObject[] gamePadPanels;
+    [SerializeField] GameObject[] keyboardPanels;
+    [SerializeField] TextMeshProUGUI FlightTypeText;
+    private bool isGamepadLayout;
+
+    [Header("Menu Audio")]
+    [SerializeField] AudioSource MenuAudio;
+    [SerializeField] AudioClip MenuOpenClose;
+    [SerializeField] AudioClip ButtonClick;
+    [SerializeField] AudioClip BackButtonClick;
+
 
     public override void OnNetworkSpawn()
     {
         if (!IsOwner) {  return; }
-        inputReader.OnMenuEvent += OpenMainMenu;
+        MainMenu.SetActive(false);
+        inputReader.OnMenuEvent += TriggerMainMenu;
     }
 
     public override void OnNetworkDespawn()
     {
         if (!IsOwner) { return; }
-        inputReader.OnMenuEvent -= OpenMainMenu;
+        inputReader.OnMenuEvent -= TriggerMainMenu;
     }
     public void LeaveGame()
     {
@@ -38,98 +63,178 @@ public class PlayerMenu : NetworkBehaviour
         // case for when player wants to leave and hits leave button 
         ClientSingleton.Instance.GameManager.Disconnect();
     }
-    public void OpenMainMenu()
+    public void TriggerMainMenu()
     {
         if (!IsOwner) { return; }
-        MainMenu.SetActive(true);
-        DisablePlayerControls();
+        MenuAudio.PlayOneShot(MenuOpenClose);
+        MenuState = !MenuState;
+
+        if (MenuState == true)
+        {
+            isMainMenuOpen = true;
+            DisablePlayerControls();
+            MainMenu.SetActive(true);
+            mainMenuCanvas.transform.GetChild(0).gameObject.SetActive(true);
+            //if (isMainMenuOpen == true)
+            //{
+            //    for (int i = 1; i < mainMenuCanvas.transform.childCount; i++)
+            //    {
+            //        mainMenuCanvas.transform.GetChild(0).gameObject.SetActive(false);
+            //    }
+            //}
+
+        }
+        if (MenuState == false)
+        {
+            EnablePlayerControls();
+            isMainMenuOpen = false;
+            if (isMainMenuOpen == false)
+            {
+                
+                MainMenu.SetActive(false);
+                for (int i = 0; i < mainMenuCanvas.transform.childCount; i++)
+                {
+                    mainMenuCanvas.transform.GetChild(i).gameObject.SetActive(false);
+                }
+            }
+        }
+
+        
+
+       
     }
 
     #region UI Navigation
     public void ResumeGame()
     {
         if (!IsOwner) { return; }
+        MenuAudio.PlayOneShot(MenuOpenClose);
         MainMenu.SetActive(false);
+        MenuState = false;
         EnablePlayerControls();
     }
 
-    public void OpenControlsPanel(GameObject PanelToOpen, List<GameObject> PanelsToClose, GameObject[] SubPanels)
+    public void OpenPanel(int panelIndex)
     {
         if (!IsOwner) { return; }
-        foreach (GameObject panel in PanelsToClose)
+        for (int i = 0;  i < mainMenuCanvas.transform.childCount; i++)
         {
-            panel.SetActive(false);
-        }
-        PanelToOpen.SetActive(true);
-        SubPanels[0].SetActive(true);
-        for (int i = 1; i<= SubPanels.Length; i++)
-        {
-            SubPanels[i].SetActive(false); // This way it always starts on the 0th index and I don't 
+            if (i == panelIndex)
+            {
+                MenuAudio.PlayOneShot(ButtonClick);
+                mainMenuCanvas.transform.GetChild(i).gameObject.SetActive(true);
+
+                if(mainMenuCanvas.transform.GetChild(i).gameObject.name == ControlPanelName)
+                {
+                    Debug.Log("Name of object is " + mainMenuCanvas.transform.GetChild(i).gameObject.name);
+                    ShowGamepadLayout();
+                }
+            }
+            else
+            {
+                mainMenuCanvas.transform.GetChild(i).gameObject.SetActive(false) ;
+            }
         }
     }
 
     public void BackButton(GameObject currentPanelToClose)
     {
         if (!IsOwner) { return; }
+        MenuAudio.PlayOneShot(BackButtonClick);
         currentPanelToClose.SetActive(false);
         MainMenu.SetActive(true);
     }
-    
-        
+     
     #endregion
+
+
     #region PlayerControls
     private void DisablePlayerControls()
     {
-        if (!this.TryGetComponent<PlayerMovement>(out PlayerMovement playerMovement)) { return; }
-        {
-            playerMovement.enabled = false;
-        }
-        if (!this.TryGetComponent<ThirdPersonControls>(out ThirdPersonControls thirdPersonControls)) { return; }
-        {
-            thirdPersonControls.enabled = false;
-        }
-        if (!this.TryGetComponent<PlayerAiming>(out PlayerAiming playerAiming)) { return; }
-        {
-            playerAiming.enabled = false;
-        }
-        if (!this.TryGetComponent<ProjectileLauncher>(out ProjectileLauncher projectileLauncher)) { return; }
-        {
-            projectileLauncher.enabled = false;
-        }
-        if (!this.TryGetComponent<Spin>(out Spin spin)) { return; }
-        {
-            spin.enabled = false;
-        }
+
+        playerReference.GetComponent<PlayerMovement>().enabled = false;
+        playerReference.GetComponent<ThirdPersonControls>().enabled = false;
+        playerReference.GetComponent<PlayerAiming>().enabled = false;
+        playerReference.GetComponent<ProjectileLauncher>().enabled = false;
+        playerReference.GetComponent<Spin>().enabled = false;
+
     }
     private void EnablePlayerControls()
     {
-        if (!this.TryGetComponent<PlayerMovement>(out PlayerMovement playerMovement)) { return; }
+        playerReference.GetComponent<PlayerMovement>().enabled = true;
+        playerReference.GetComponent<ThirdPersonControls>().enabled = true;
+        playerReference.GetComponent<PlayerAiming>().enabled = true;
+        playerReference.GetComponent<ProjectileLauncher>().enabled = true;
+        playerReference.GetComponent<Spin>().enabled = true;
+    }
+    #endregion
+
+
+    #region Layouts
+
+    public void ShowGamepadLayout()
+    {
+        if (!IsOwner) { return; }
+        MenuAudio.PlayOneShot(ButtonClick);
+        isGamepadLayout = true;
+        gamePadPanelContainer.SetActive(isGamepadLayout);
+        keyboardPanelContainer.SetActive(!isGamepadLayout);
+        ShowGamePadDefaultLayout();
+    }
+    public void ShowKeyboardLayout()
+    {
+        if (!IsOwner) { return; }
+        MenuAudio.PlayOneShot(ButtonClick);
+        isGamepadLayout = false;
+        keyboardPanelContainer.SetActive(!isGamepadLayout);
+        gamePadPanelContainer.SetActive(isGamepadLayout);
+        ShowKeyboardDefaultLayout();
+    }
+    private void ShowGamePadDefaultLayout()
+    {
+        FlightTypeText.text = "Top Down";
+        gamePadPanels[0].SetActive(true);
+        gamePadPanels[1].SetActive(false);
+    }
+    private void ShowKeyboardDefaultLayout()
+    {
+        FlightTypeText.text = "Top Down";
+        keyboardPanels[0].SetActive(true);
+        keyboardPanels[1].SetActive(false);
+    }
+
+    public void PreviousLayout()
+    {
+        if (!IsOwner) { return; }
+        FlightTypeText.text = "Top Down";
+        MenuAudio.PlayOneShot(ButtonClick);
+        if (isGamepadLayout == true)
         {
-            playerMovement.enabled = true;
+            gamePadPanels[0].SetActive(true);
+            gamePadPanels[1].SetActive(false);
         }
-        if (!this.TryGetComponent<ThirdPersonControls>(out ThirdPersonControls thirdPersonControls)) { return; }
+        else
         {
-            thirdPersonControls.enabled = true;
+            keyboardPanels[0].SetActive(true);
+            keyboardPanels[1].SetActive(false);
         }
-        if (!this.TryGetComponent<PlayerAiming>(out PlayerAiming playerAiming)) { return; }
+    }
+    public void NextLayout()
+    {
+        if (!IsOwner) { return; }
+        FlightTypeText.text = "Free Flight";
+        MenuAudio.PlayOneShot(ButtonClick);
+        if (isGamepadLayout == true)
         {
-            playerAiming.enabled = true;
+            gamePadPanels[0].SetActive(false);
+            gamePadPanels[1].SetActive(true);
         }
-        if (!this.TryGetComponent<ProjectileLauncher>(out ProjectileLauncher projectileLauncher)) { return; }
+        else
         {
-            projectileLauncher.enabled = true;
-        }
-        if (!this.TryGetComponent<Spin>(out Spin spin)) { return; }
-        {
-            spin.enabled = true;
+            keyboardPanels[0].SetActive(false);
+            keyboardPanels[1].SetActive(true);
         }
     }
     #endregion
 }
 
-[System.Serializable]
-public class GoingBack: UnityEvent<GameObject, GameObject>
-{
-    public GameObject panelToOpen;
-    public GameObject panelToClose;
-}
