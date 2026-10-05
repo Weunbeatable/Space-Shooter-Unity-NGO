@@ -34,6 +34,7 @@ public class Crosshairs : NetworkBehaviour
         centerDotFiringColor = Color.red;
         crossHairFiringColor = new Color(150, 119, 119);
         crossHairsIcon.gameObject.SetActive(false);
+        centerDotIcon.gameObject.SetActive(false);
         PlayerMovement.OnThirdPersonEnter += UseThirdPersonAiming;
         PlayerMovement.OnTopDownEnter += UseTopDownAiming;
         inputReader.PrimaryFireEvent += TriggerDynamicCrosshair;
@@ -116,12 +117,13 @@ public class Crosshairs : NetworkBehaviour
     private void UseThirdPersonAiming()
     {
         crossHairsIcon.gameObject.SetActive(true);
-
+        centerDotIcon.gameObject.SetActive(true);
     }
 
     private void UseTopDownAiming()
     {
         crossHairsIcon.gameObject.SetActive(false);
+        centerDotIcon.gameObject.SetActive(false);
     }
 
     private void TriggerDynamicCrosshair(bool isFiring)
