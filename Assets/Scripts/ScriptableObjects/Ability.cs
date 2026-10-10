@@ -2,17 +2,12 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Ability : MonoBehaviour
+[CreateAssetMenu(fileName ="Ship_Ability", menuName = "ScriptableObjects/Ability")]
+public class Ability : ActionItem
 {
-    // Start is called before the first frame update
-    void Start()
+    [SerializeField] TargetingStrategy targetingStrategy;
+    public override void Use(GameObject user)
     {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
+        targetingStrategy.StartTargeting(user);
     }
 }

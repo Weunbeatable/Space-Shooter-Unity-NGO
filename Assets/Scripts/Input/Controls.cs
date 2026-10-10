@@ -116,6 +116,15 @@ public partial class @Controls: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Remove Skill"",
+                    ""type"": ""Button"",
+                    ""id"": ""9c022546-7a78-45bb-8006-28ebd1475ad9"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -479,6 +488,28 @@ public partial class @Controls: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""groups"": ""Controller"",
                     ""action"": ""Menu"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""db7a0541-845b-4c2f-9f61-fa6b42657b82"",
+                    ""path"": ""<Keyboard>/h"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Mouse&Key"",
+                    ""action"": ""Remove Skill"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""eb6f8b45-4b80-40cb-b128-4a90fd572494"",
+                    ""path"": ""<Gamepad>/dpad/left"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Controller"",
+                    ""action"": ""Remove Skill"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -1920,6 +1951,7 @@ public partial class @Controls: IInputActionCollection2, IDisposable
         m_Player_Map = m_Player.FindAction("Map", throwIfNotFound: true);
         m_Player_BarrelRollSpin = m_Player.FindAction("BarrelRollSpin", throwIfNotFound: true);
         m_Player_Menu = m_Player.FindAction("Menu", throwIfNotFound: true);
+        m_Player_RemoveSkill = m_Player.FindAction("Remove Skill", throwIfNotFound: true);
         // Player1
         m_Player1 = asset.FindActionMap("Player1", throwIfNotFound: true);
         m_Player1_Move = m_Player1.FindAction("Move", throwIfNotFound: true);
@@ -2027,6 +2059,7 @@ public partial class @Controls: IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_Map;
     private readonly InputAction m_Player_BarrelRollSpin;
     private readonly InputAction m_Player_Menu;
+    private readonly InputAction m_Player_RemoveSkill;
     public struct PlayerActions
     {
         private @Controls m_Wrapper;
@@ -2041,6 +2074,7 @@ public partial class @Controls: IInputActionCollection2, IDisposable
         public InputAction @Map => m_Wrapper.m_Player_Map;
         public InputAction @BarrelRollSpin => m_Wrapper.m_Player_BarrelRollSpin;
         public InputAction @Menu => m_Wrapper.m_Player_Menu;
+        public InputAction @RemoveSkill => m_Wrapper.m_Player_RemoveSkill;
         public InputActionMap Get() { return m_Wrapper.m_Player; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -2080,6 +2114,9 @@ public partial class @Controls: IInputActionCollection2, IDisposable
             @Menu.started += instance.OnMenu;
             @Menu.performed += instance.OnMenu;
             @Menu.canceled += instance.OnMenu;
+            @RemoveSkill.started += instance.OnRemoveSkill;
+            @RemoveSkill.performed += instance.OnRemoveSkill;
+            @RemoveSkill.canceled += instance.OnRemoveSkill;
         }
 
         private void UnregisterCallbacks(IPlayerActions instance)
@@ -2114,6 +2151,9 @@ public partial class @Controls: IInputActionCollection2, IDisposable
             @Menu.started -= instance.OnMenu;
             @Menu.performed -= instance.OnMenu;
             @Menu.canceled -= instance.OnMenu;
+            @RemoveSkill.started -= instance.OnRemoveSkill;
+            @RemoveSkill.performed -= instance.OnRemoveSkill;
+            @RemoveSkill.canceled -= instance.OnRemoveSkill;
         }
 
         public void RemoveCallbacks(IPlayerActions instance)
@@ -2515,6 +2555,7 @@ public partial class @Controls: IInputActionCollection2, IDisposable
         void OnMap(InputAction.CallbackContext context);
         void OnBarrelRollSpin(InputAction.CallbackContext context);
         void OnMenu(InputAction.CallbackContext context);
+        void OnRemoveSkill(InputAction.CallbackContext context);
     }
     public interface IPlayer1Actions
     {

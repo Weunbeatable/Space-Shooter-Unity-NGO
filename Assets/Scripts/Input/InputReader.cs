@@ -17,6 +17,7 @@ public class InputReader : ScriptableObject, IPlayerActions
     public event Action<bool> MapViewEvent;
     public event Action OnMenuEvent;
     public event Action SpinEvent;
+    public event Action RemoveSkillEvent;
 
     public Vector2 AimPosition {  get; private set; }
     public Vector2 MouseAimPosition { get; private set; }
@@ -147,6 +148,14 @@ public class InputReader : ScriptableObject, IPlayerActions
         if (context.performed)
         {
             OnMenuEvent?.Invoke();
+        }
+    }
+
+    public void OnRemoveSkill(InputAction.CallbackContext context)
+    {
+        if (context.performed)
+        {
+            RemoveSkillEvent?.Invoke();
         }
     }
 }

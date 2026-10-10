@@ -62,3 +62,7 @@ portal gun: - fire a portal forward that closes after a set time, links to the c
 Next map mostly 3rd person with the top down controls reserved for sections of the map that are emant for top down like aboned transport
 sections that are rail like in pattern and easier to navigate but are enclosed. Will have to block the bottoms and tops of maps aka add floors
 but it should work. 
+
+Luke Nukem.... for obvios copyright reasons. ("Hi my name is Luke... I am going to nuke you now"), cast a sphere you can use to place a nuke on to the map (in third person you'll be forced into a top down camera temporarily.)
+getting hit will not take you out of the skill but dying will. While droppig payload damage done to you is halved. Payload releases a massive nuke that damages all non friendlies. Has a long cooldown, cannot be recalled. 
+Will work similar to ASQB, no particular range limit on the nuke. The camera will follow crosshair so be careful where you drop this bad boy. 

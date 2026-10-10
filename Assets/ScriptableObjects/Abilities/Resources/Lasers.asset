@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f7d8f0c5f88715241b69cddf63a7ef94, type: 3}
+  m_Name: Lasers
+  m_EditorClassIdentifier: 
+  abilityID: 
+  abilityName: Lasers
+  abilityDescription: Fire off high velocity lasers that deal less damage than physical
+    projectiles but can be fired faster and at a lower cost.
+  abilityIcon: {fileID: 21300000, guid: a658ec0d4c286ed489843b72ebb7a3a0, type: 3}
+  targetingStrategy: {fileID: 2365718658543101001, guid: ace37fcbd6b7802428c5137cb4052f29,
+    type: 3}
