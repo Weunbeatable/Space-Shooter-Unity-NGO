@@ -66,3 +66,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7f694b9f25213744aabef856005b1e05, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  cursorTexture: {fileID: 2800000, guid: 6f6c2d827b5ed454b90a1529cefe9041, type: 3}
+  cursorHotspot: {x: 0, y: 0}
+  inputReader: {fileID: 11400000, guid: 2b0ed51268b2b1f46af1702daa4f5fef, type: 2}
+  hasTargettingStarted: 0
+  playerReference: {fileID: 0}

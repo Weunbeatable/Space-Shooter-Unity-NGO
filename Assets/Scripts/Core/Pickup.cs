@@ -8,9 +8,10 @@ public class Pickup : NetworkBehaviour
     [SerializeField] Ability abilityTopickup;
     private void OnTriggerEnter(Collider other)
     {
-        if(!other.gameObject.TryGetComponent<AbilitySlot>(out AbilitySlot playerAbility)) { return; }
+        if(!other.attachedRigidbody.TryGetComponent<AbilitySlot>(out AbilitySlot playerAbility)) { return; }
         {
             playerAbility.SetAbility(abilityTopickup);
+            Debug.Log("Object acquired");
         }
 
         Destroy(this.gameObject);
