@@ -6,6 +6,10 @@ using UnityEngine;
 
 public class AbilitySpawner : NetworkBehaviour
 {
+// when item spawns in, users cameras should up be updated
+// item spawns in.
+// once spawning complete, ping it on map,
+// give up camera control. 
     private event Action InitiateAbilitySpawn;
     [SerializeField] private List<GameObject> abilityPrefab;
 
