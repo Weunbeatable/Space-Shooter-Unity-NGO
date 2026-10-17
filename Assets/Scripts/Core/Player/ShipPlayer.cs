@@ -13,11 +13,14 @@ public class ShipPlayer : NetworkBehaviour
     [Header("References")]
     [SerializeField] CinemachineVirtualCamera cinemachineVirtualCamera;
     [SerializeField] CinemachineVirtualCamera thirdPersonCam;
+    [SerializeField] CinemachineVirtualCamera announcementCamera; 
     [SerializeField] private SpriteRenderer minimapIconRenderer;
 
     [Header("Settings")]
     [SerializeField] public int ownerPriority { get; set; } = 15;
     [SerializeField] public int ownerSeconndaryPriority { get; set; } = 14;
+
+    [SerializeField] public int announcementPriority { get; set; } = 11;
 
     [SerializeField] private Color ownerColor;
     [field: SerializeField] public Rigidbody playerBody { get; set; }

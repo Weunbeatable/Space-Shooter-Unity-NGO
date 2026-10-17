@@ -10,7 +10,13 @@ public class AbilitySpawner : NetworkBehaviour
 // item spawns in.
 // once spawning complete, ping it on map,
 // give up camera control. 
-    private event Action InitiateAbilitySpawn;
+    private event Action InitiateAbilitySpawn; // will pass a float for the time duration so other scripts can utilize it if necessary for how long to take over ship controls. 
+    [SerializeField] private AudioSource AnnouncementSource;
+
+    [SerializeField] private AudioClip supplyDropClip;
+
+    [SerializeField] private AudioClip materializationClip;
+
     [SerializeField] private List<GameObject> abilityPrefab;
 
     [SerializeField] private int maxAbilitiesToSpawn = 20;
@@ -27,7 +33,17 @@ public class AbilitySpawner : NetworkBehaviour
 
     private float abilityPrefabRadius;
 
-    private float abilitySpawnTimer = 30f;
+    [SerializeField] private float abilitySpawnTimer;
+
+    private float announcementTimer;
+
+    [SerializeField] private float minTimerValue;
+
+    [SerializeField] private float maxTimerValue;
+
+    private bool supplyDropAnnouncementStarted;
+
+    private bool materializationAnnouncementStarted;
 
     private Collider[] coinBuffer = new Collider[1];
     // need to know how big coin is when spawning
@@ -35,8 +51,12 @@ public class AbilitySpawner : NetworkBehaviour
     {
         if (!IsServer) { return; }
 
+
+        announcementTimer = UnityEngine.Random.Range(minTimerValue, maxTimerValue);
+        
+
         // pick an ability from the list first
-        int randomAbility =UnityEngine.Random.Range(0, abilityPrefab.Count - 1);
+        int randomAbility = UnityEngine.Random.Range(0, abilityPrefab.Count - 1);
 
         // provide an array buffer to provide results, also just need to know if it collided with something not exactly what it was
         abilityPrefabRadius = abilityPrefab[randomAbility].GetComponent<CapsuleCollider>().radius;
@@ -46,6 +66,38 @@ public class AbilitySpawner : NetworkBehaviour
         {
             SpawnAbility();
         }
+    }
+
+    private void Update()
+    {
+        if (supplyDropAnnouncementStarted)
+        {
+            announcementTimer -= Time.deltaTime;
+        }
+       
+        if(announcementTimer <= 0f)
+        {
+            announcementTimer = 0f;
+            supplyDropAnnouncementStarted = true;
+            // play supply drop sound
+            AnnouncementSource.PlayOneShot(supplyDropClip);
+            abilitySpawnTimer = UnityEngine.Random.Range(minTimerValue, maxTimerValue);
+        }
+        if(supplyDropAnnouncementStarted == true)
+        {
+            abilitySpawnTimer -= Time.deltaTime;
+        }
+        if (abilitySpawnTimer <= 0f)
+        {
+            materializationAnnouncementStarted = true;
+        }
+        if(materializationAnnouncementStarted == true)
+        {
+            AnnouncementSource.PlayOneShot(materializationClip);
+            // play materialization sound
+            // 
+        }
+        
     }
     private void SpawnAbility()
     {
