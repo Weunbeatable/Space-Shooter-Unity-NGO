@@ -10,7 +10,7 @@ public class AbilitySpawner : NetworkBehaviour
 // item spawns in.
 // once spawning complete, ping it on map,
 // give up camera control. 
-    private event Action InitiateAbilitySpawn; // will pass a float for the time duration so other scripts can utilize it if necessary for how long to take over ship controls. 
+    private event Action<Transform, float> OnMaterializeAbility; // will pass a float for the time duration so other scripts can utilize it if necessary for how long to take over ship controls. 
     [SerializeField] private AudioSource AnnouncementSource;
 
     [SerializeField] private AudioClip supplyDropClip;
@@ -30,22 +30,29 @@ public class AbilitySpawner : NetworkBehaviour
     [SerializeField] private Vector3 zSpawnRange;
 
     [SerializeField] private LayerMask layerMask; // ensure coins aren't being spawned int he wrong places like walls or terrain. 
-
-    private float abilityPrefabRadius;
-
-    [SerializeField] private float abilitySpawnTimer;
-
-    private float announcementTimer;
-
     [SerializeField] private float minTimerValue;
 
     [SerializeField] private float maxTimerValue;
+
+
+    [SerializeField] private float abilitySpawnTimer;
+
+    [SerializeField] public float materializationDelayTimer = 0f;
+
+
+    private float abilityPrefabRadius;
+
+
+    private float announcementTimer;
+
 
     private bool supplyDropAnnouncementStarted;
 
     private bool materializationAnnouncementStarted;
 
     private Collider[] coinBuffer = new Collider[1];
+
+    public Transform materializedAbilityTransform;
     // need to know how big coin is when spawning
     public override void OnNetworkSpawn()
     {
@@ -58,14 +65,21 @@ public class AbilitySpawner : NetworkBehaviour
         // pick an ability from the list first
         int randomAbility = UnityEngine.Random.Range(0, abilityPrefab.Count - 1);
 
+
+        OnMaterializeAbility += InitiateMaterialization;
         // provide an array buffer to provide results, also just need to know if it collided with something not exactly what it was
-        abilityPrefabRadius = abilityPrefab[randomAbility].GetComponent<CapsuleCollider>().radius;
+        //abilityPrefabRadius = abilityPrefab[randomAbility].GetComponent<CapsuleCollider>().radius;
 
         // spawn coins a bunch 
-        for (int i = 0; i < maxAbilitiesToSpawn; i++)
-        {
-            SpawnAbility();
-        }
+        //for (int i = 0; i < maxAbilitiesToSpawn; i++)
+        //{
+        //    SpawnAbility();
+        //}
+    }
+
+    private void InitiateMaterialization(Transform abilityTransform, float delayTimer)
+    {
+        AnnouncementSource.PlayOneShot(materializationClip);
     }
 
     private void Update()
@@ -93,23 +107,25 @@ public class AbilitySpawner : NetworkBehaviour
         }
         if(materializationAnnouncementStarted == true)
         {
-            AnnouncementSource.PlayOneShot(materializationClip);
-            // play materialization sound
-            // 
+            SpawnAbility();
         }
         
     }
     private void SpawnAbility()
     {
         int randomAbility = UnityEngine.Random.Range(0, abilityPrefab.Count - 1);
-        GameObject coinInstance = Instantiate(
+        GameObject abilityInstance = Instantiate(
             abilityPrefab[randomAbility],
             GetSpawnPoint(),
             Quaternion.identity);
-        coinInstance.GetComponent<NetworkObject>().Spawn();
+        abilityInstance.GetComponent<NetworkObject>().Spawn();
 
+        // provide new transform data so i can pass the positional data to other scripts that need it including transform data. 
+
+        materializedAbilityTransform = abilityInstance.transform;
         //listen in 
-       // coinInstance.OnCollected += HandleCoinCollected;
+        // once an object is spawned then pass it into the event. 
+        OnMaterializeAbility?.Invoke(materializedAbilityTransform, materializationDelayTimer);
     }
 
     private void HandleCoinCollected(RespawningCoin coin)
