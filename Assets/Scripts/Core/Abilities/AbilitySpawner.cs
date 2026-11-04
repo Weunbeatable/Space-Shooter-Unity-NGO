@@ -10,7 +10,7 @@ public class AbilitySpawner : NetworkBehaviour
 // item spawns in.
 // once spawning complete, ping it on map,
 // give up camera control. 
-    private event Action<Transform, float> OnMaterializeAbility; // will pass a float for the time duration so other scripts can utilize it if necessary for how long to take over ship controls. 
+    public event Action<Transform, float> OnMaterializeAbility; // will pass a float for the time duration so other scripts can utilize it if necessary for how long to take over ship controls. 
     [SerializeField] private AudioSource AnnouncementSource;
 
     [SerializeField] private AudioClip supplyDropClip;
@@ -39,34 +39,48 @@ public class AbilitySpawner : NetworkBehaviour
 
     [SerializeField] public float materializationDelayTimer = 0f;
 
-
-    private float abilityPrefabRadius;
-
-
     private float announcementTimer;
-
-
-    private bool supplyDropAnnouncementStarted;
-
-    private bool materializationAnnouncementStarted;
+    private float abilityPrefabRadius;
 
     private Collider[] coinBuffer = new Collider[1];
 
-    public Transform materializedAbilityTransform;
+    public NetworkObject materializedAbilityNetworkObject;
+
+    private Coroutine spawnSequence;
+
+    public static AbilitySpawner Instance;
     // need to know how big coin is when spawning
+
+
+    private void Awake()
+    {
+
+        if (Instance != null && Instance != this)
+        {
+            Debug.LogWarning("An instance already exists " + this.name);
+            return;
+        }
+        Instance = this;
+    }
     public override void OnNetworkSpawn()
     {
+        // add singleton 
+        if(Instance != this)
+        {
+            Debug.Log("Invalid ability spawer instance created");
+            return;
+        }
+
+
         if (!IsServer) { return; }
 
+        OnMaterializeAbility += InitiateMaterialization;
 
-        announcementTimer = UnityEngine.Random.Range(minTimerValue, maxTimerValue);
-        
+        spawnSequence = StartCoroutine(SpawnSequence());
 
         // pick an ability from the list first
         int randomAbility = UnityEngine.Random.Range(0, abilityPrefab.Count - 1);
 
-
-        OnMaterializeAbility += InitiateMaterialization;
         // provide an array buffer to provide results, also just need to know if it collided with something not exactly what it was
         //abilityPrefabRadius = abilityPrefab[randomAbility].GetComponent<CapsuleCollider>().radius;
 
@@ -77,61 +91,124 @@ public class AbilitySpawner : NetworkBehaviour
         //}
     }
 
+    public override void OnNetworkDespawn()
+    {
+        if(Instance == this)
+        {
+            Instance = null;
+        }
+        if (spawnSequence != null)
+        {
+            StopCoroutine(spawnSequence);
+            spawnSequence = null;
+        }
+        base.OnNetworkDespawn();
+    }
+
     private void InitiateMaterialization(Transform abilityTransform, float delayTimer)
     {
         AnnouncementSource.PlayOneShot(materializationClip);
     }
 
+    private IEnumerator SpawnSequence()
+    {
+        // initial timer wait
+        announcementTimer = UnityEngine.Random.Range(minTimerValue, maxTimerValue);
+
+        yield return new WaitForSeconds(announcementTimer);
+
+        // play audio suply drop 
+        PlaySupplyDropAnnounncementClientRpc();
+
+        // wait before an actual spawn starts
+        abilitySpawnTimer = UnityEngine.Random.Range(minTimerValue, maxTimerValue);
+
+        yield return new WaitForSeconds(abilitySpawnTimer);
+
+        // Spawn ability and notify listeners
+        SpawnAbility();
+
+        spawnSequence = null;
+    }
+
     private void Update()
     {
-        if (supplyDropAnnouncementStarted)
-        {
-            announcementTimer -= Time.deltaTime;
-        }
-       
-        if(announcementTimer <= 0f)
-        {
-            announcementTimer = 0f;
-            supplyDropAnnouncementStarted = true;
-            // play supply drop sound
-            AnnouncementSource.PlayOneShot(supplyDropClip);
-            abilitySpawnTimer = UnityEngine.Random.Range(minTimerValue, maxTimerValue);
-        }
-        if(supplyDropAnnouncementStarted == true)
-        {
-            abilitySpawnTimer -= Time.deltaTime;
-        }
-        if (abilitySpawnTimer <= 0f)
-        {
-            materializationAnnouncementStarted = true;
-        }
-        if(materializationAnnouncementStarted == true)
-        {
-            SpawnAbility();
-        }
-        
+       if(!IsServer) { return; }
+
     }
     private void SpawnAbility()
     {
+        if (!IsServer) { return; }
+
         int randomAbility = UnityEngine.Random.Range(0, abilityPrefab.Count - 1);
+
+        // need to collider for validatio to prevent stacking an ability in the same place.
+
+        GameObject fab  = abilityPrefab[randomAbility];
+
+
         GameObject abilityInstance = Instantiate(
             abilityPrefab[randomAbility],
             GetSpawnPoint(),
             Quaternion.identity);
-        abilityInstance.GetComponent<NetworkObject>().Spawn();
 
+        NetworkObject abilityNetworkObject = abilityInstance.GetComponent<NetworkObject>();
+
+        if (NetworkObject == null)
+        {
+            Destroy(abilityInstance); return;
+        }
+
+        //server nentwork spawn
+        abilityNetworkObject.Spawn();
+
+       
         // provide new transform data so i can pass the positional data to other scripts that need it including transform data. 
-
-        materializedAbilityTransform = abilityInstance.transform;
+        NotifyMaterializationClientRpc(
+            new NetworkObjectReference(abilityNetworkObject), 
+            materializationDelayTimer);
+        materializedAbilityNetworkObject = abilityNetworkObject;
         //listen in 
+        if (IsServer)
+        {
+            ShipPlayer[] players = FindObjectsByType<ShipPlayer>(FindObjectsSortMode.None);
+            foreach (ShipPlayer player in players)
+            {
+                player.abilityController.TriggerPresentation(materializedAbilityNetworkObject, materializationDelayTimer);
+            }
+        }
         // once an object is spawned then pass it into the event. 
-        OnMaterializeAbility?.Invoke(materializedAbilityTransform, materializationDelayTimer);
+        OnMaterializeAbility?.Invoke(materializedAbilityNetworkObject.transform, materializationDelayTimer);
     }
 
-    private void HandleCoinCollected(RespawningCoin coin)
+
+    [ClientRpc]
+    private void PlaySupplyDropAnnounncementClientRpc()
     {
-        coin.transform.position = GetSpawnPoint();
-        coin.Reset();
+        if (AnnouncementSource != null && supplyDropClip != null)
+        {
+            AnnouncementSource.PlayOneShot(supplyDropClip);
+        }
+    }
+
+
+    [ClientRpc]
+    private void NotifyMaterializationClientRpc(NetworkObjectReference networkObjectReference, float materializationDelayTimer)
+    {
+        if(!networkObjectReference.TryGet(out NetworkObject networkObject))
+        {
+            Debug.LogWarning("Couldn't respolve the spawned ability Network Object" + this);
+            return;
+        }
+
+        Transform abilityTransform = networkObject.transform;
+
+        if (AnnouncementSource != null && materializationClip != null)
+        {
+            AnnouncementSource.PlayOneShot(materializationClip);
+        }
+        // execute locally on each client
+        OnMaterializeAbility?.Invoke(abilityTransform, materializationDelayTimer);
     }
 
     private Vector3 GetSpawnPoint()
@@ -166,6 +243,14 @@ public class AbilitySpawner : NetworkBehaviour
             {
                 return spawnPoint;
             }
+        }
+    }
+
+    private void OnDestroy()
+    {
+        if (Instance == this)
+        {
+            Instance = null;
         }
     }
 }

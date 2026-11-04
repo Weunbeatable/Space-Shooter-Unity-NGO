@@ -15,6 +15,7 @@ public class ShipPlayer : NetworkBehaviour
     [SerializeField] CinemachineVirtualCamera thirdPersonCam;
     [SerializeField] CinemachineVirtualCamera announcementCamera; 
     [SerializeField] private SpriteRenderer minimapIconRenderer;
+    [SerializeField] AbilitySpawner spawnerInstance;
 
     [Header("Settings")]
     [SerializeField] public int ownerPriority { get; set; } = 15;
@@ -26,6 +27,8 @@ public class ShipPlayer : NetworkBehaviour
     [field: SerializeField] public Rigidbody playerBody { get; set; }
     [field: SerializeField] public Health Health { get; set; } // field will leave it exposed in editor without open to modification
     [field: SerializeField] public CoinWallet Wallet { get; set; } // field will leave it exposed in editor without open to modification
+
+    [field: SerializeField] public AbilityPresentationController abilityController { get; set; } // field will leave it exposed in editor without open to modification
     // network variable that will sync over the network
     public NetworkVariable<FixedString32Bytes> PlayerName = new NetworkVariable<FixedString32Bytes>();
 
@@ -49,18 +52,50 @@ public class ShipPlayer : NetworkBehaviour
         {
             // everyone has the same priority till spawned on network, but your own player will get higher priority 15
             // when spawned on network 
+            spawnerInstance = AbilitySpawner.Instance;
+            //spawnerInstance.onm
             cinemachineVirtualCamera.Priority = ownerPriority;
             thirdPersonCam.Priority = ownerSeconndaryPriority;
+            announcementCamera.Priority = announcementPriority;
 
             minimapIconRenderer.color = ownerColor;
+            abilityController.OnMaterializationPresentation += PresentationControlsSetup;
         }
     }
 
+    private void PresentationControlsSetup(Transform transform, float delayTime)
+    {
+        StartCoroutine(AbilityPresenting(transform, delayTime));
+    }
+
+    public IEnumerator AbilityPresenting(Transform AbilityToFocusOn, float waitTime)
+    {
+        // small chance it spawns on someone and they immediately get the ability which essentially means there is
+        // nothing to focus on
+        //if(AbilityToFocusOn == null) { yield return new WaitForSeconds(0f); }
+        if (AbilityToFocusOn != null)
+        {
+            announcementCamera.Follow = AbilityToFocusOn;
+            announcementCamera.LookAt = AbilityToFocusOn;
+            announcementPriority = 18;
+            announcementCamera.Priority = announcementPriority;
+            Health.SetInvulnerability(true);
+        }
+        yield return new WaitForSeconds(waitTime);
+        announcementPriority = 11;
+        announcementCamera.Priority = announcementPriority;
+        Health.SetInvulnerability(false);
+        Debug.Log($"Invulnerability state is set to {Health.IsInvulnerable()}");
+    }
     public override void OnNetworkDespawn()
     {
         if (IsServer)
         {
             OnPlayerDespawned?.Invoke(this);
+        }
+        if (IsOwner)
+        {
+            abilityController.OnMaterializationPresentation -= PresentationControlsSetup;
         }
     }
 

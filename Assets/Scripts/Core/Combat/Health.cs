@@ -14,6 +14,7 @@ public class Health : NetworkBehaviour
 
     // ensure death doesn't trigger twice in case something happens on the network
     private bool isDead;
+    private bool isInvulnerable = false;
 
     public Action<Health> onDie;
     public override void OnNetworkSpawn()
@@ -25,6 +26,7 @@ public class Health : NetworkBehaviour
 
     public void TakeDamage(int damageValue)
     {
+        if (isInvulnerable == true) { return; }
         ModifyHealth(-damageValue);
     }
 
@@ -46,4 +48,10 @@ public class Health : NetworkBehaviour
             isDead = true;
         }
     }
+    public void SetInvulnerability(bool isInvulnerable)
+    {
+        this.isInvulnerable = isInvulnerable;
+    }
+
+    public bool IsInvulnerable() => isInvulnerable;
 }

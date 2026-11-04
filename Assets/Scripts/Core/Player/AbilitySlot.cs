@@ -16,7 +16,6 @@ public class AbilitySlot : NetworkBehaviour
     public override void OnNetworkSpawn()
     {
        if(!IsOwner) { return; }
-        AbilityEquipStatusChange?.Invoke(skill);
         inputReader.RemoveSkillEvent += SkillCleanup;
         inputReader.UseAbilityEvent += ActivatingSkill;
     }
@@ -24,6 +23,7 @@ public class AbilitySlot : NetworkBehaviour
     {
         if (!IsOwner) { return; }
         inputReader.RemoveSkillEvent -= SkillCleanup;
+        inputReader.UseAbilityEvent -= ActivatingSkill;
     }
     private void ActivatingSkill(bool obj)
     {
@@ -33,8 +33,8 @@ public class AbilitySlot : NetworkBehaviour
     public void SetAbility(Ability abilitySet)
     {
         skill = abilitySet;
-
-        AbilityEquipStatusChange?.Invoke(abilitySet);
+        Debug.Log("Skill slot now contains " + skill.name);
+        AbilityEquipStatusChange?.Invoke(skill);
     }
 
     public void ClearAbility()

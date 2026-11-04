@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f7d8f0c5f88715241b69cddf63a7ef94, type: 3}
   m_Name: LukeNukem
   m_EditorClassIdentifier: 
-  abilityID: 
+  abilityID: Bomb001
   abilityName: Luke Nukem
   abilityDescription: 'In Honor of his father *REDACTED* send out a quantam ballista
     That will deal massive AOE damage, While launcing missle you cannot move but

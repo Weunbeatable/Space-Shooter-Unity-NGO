@@ -16,7 +16,8 @@ public class PlayerMovement : NetworkBehaviour
     [SerializeField] public Rigidbody playerBody;
     [SerializeField] private FlightCameraSettings topDownSettings;
     [SerializeField] private FlightCameraSettings thirdPersonSettings;
-    
+    [field: SerializeField] public AbilityPresentationController abilityController { get; set; } // field will leave it exposed in editor without open to modification
+
     [Header("Settings")]
     [SerializeField] private float movementSpeed = 4f;
     [SerializeField] private float turningRate = 30f;
@@ -41,7 +42,8 @@ public class PlayerMovement : NetworkBehaviour
     public override void OnNetworkSpawn()
     {
       if(!IsOwner) return;
-     
+
+        abilityController.OnMaterializationPresentation += PresentationControlsSetup;
         inputReader.MoveEvent += HandleMove;
         inputReader.ChangeAltitudeEvent += ChangeAltitude;
         inputReader.SpinEvent += ActivateSpin;
@@ -50,6 +52,7 @@ public class PlayerMovement : NetworkBehaviour
     public override void OnNetworkDespawn()
     {
        if (!IsOwner) return;
+        abilityController.OnMaterializationPresentation += PresentationControlsSetup;
         inputReader.MoveEvent -= HandleMove;
         inputReader.ChangeAltitudeEvent -= ChangeAltitude;
         inputReader.SpinEvent -= ActivateSpin;
@@ -92,6 +95,19 @@ public class PlayerMovement : NetworkBehaviour
             altitudeVelocity = 0f;
         }
         playerBody.position = position;
+    }
+
+    private void PresentationControlsSetup(Transform transform, float delayTime)
+    {
+        StartCoroutine(AbilityPresenting(transform, delayTime));
+    }
+
+    public IEnumerator AbilityPresenting(Transform AbilityToFocusOn, float waitTime)
+    {
+
+        inputReader.DisablePlayerControls();
+        yield return new WaitForSeconds(waitTime);
+        inputReader.EnablePlayerContols();
     }
     private void HandleMove(Vector2 movementInput)
     {

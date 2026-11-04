@@ -158,4 +158,7 @@ public class InputReader : ScriptableObject, IPlayerActions
             RemoveSkillEvent?.Invoke();
         }
     }
+    public void EnablePlayerContols() => controls.Player.Enable();
+
+    public void DisablePlayerControls() => controls.Player.Disable();
 }
