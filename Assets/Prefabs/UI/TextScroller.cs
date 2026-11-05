@@ -17,6 +17,7 @@ public class TextScroller : NetworkBehaviour
 
     public override void OnNetworkSpawn()
     {
+        if (!IsServer) { return; }
         AbilitySpawner.Instance.OnMaterializeAbility += PresentText;
 
     }
@@ -25,11 +26,13 @@ public class TextScroller : NetworkBehaviour
 
     public override void OnNetworkDespawn()
     {
+        if (!IsServer) { return; }
         AbilitySpawner.Instance.OnMaterializeAbility -= PresentText;
     }
 
     private void PresentText(Transform transform, float warningDuration)
     {
+        if (!IsServer) { return; }
         // 1. Get the dynamic dimensions
         canvasWidth = this.gameObject.GetComponent<RectTransform>().rect.width;
 

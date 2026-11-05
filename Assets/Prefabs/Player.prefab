@@ -158,7 +158,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 65117776924542798}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.19750683, y: -0, z: -0, w: 0.98030156}
+  m_LocalRotation: {x: 0.19750683, y: -0, z: -0, w: 0.9803015}
   m_LocalPosition: {x: 0, y: 4.2, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -18290,7 +18290,7 @@ GameObject:
   - component: {fileID: 6058485566158036503}
   m_Layer: 0
   m_Name: Deflector
-  m_TagString: Untagged
+  m_TagString: Deflector
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -24128,6 +24128,7 @@ MonoBehaviour:
   topDownSettings: {fileID: 11400000, guid: f5e814985e032c146a28d09469ee7e94, type: 2}
   thirdPersonSettings: {fileID: 11400000, guid: e3c9f66bd864f4246af718706ca8513b,
     type: 2}
+  <abilityController>k__BackingField: {fileID: 5679065366520018743}
   movementSpeed: 45
   turningRate: 270
   didAltitudeChange: 0
@@ -34727,7 +34728,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8915198008900858238}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.19750683, y: -0, z: -0, w: 0.98030156}
+  m_LocalRotation: {x: 0.19750683, y: -0, z: -0, w: 0.9803015}
   m_LocalPosition: {x: 0, y: 4.2, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
