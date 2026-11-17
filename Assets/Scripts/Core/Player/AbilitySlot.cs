@@ -25,10 +25,21 @@ public class AbilitySlot : NetworkBehaviour
         inputReader.RemoveSkillEvent -= SkillCleanup;
         inputReader.UseAbilityEvent -= ActivatingSkill;
     }
-    private void ActivatingSkill(bool obj)
+    private void ActivatingSkill(bool wasTriggerFired)
     {
         // if skills are based on coin cost there should be an attempt to activate the coin cost can be checked initally here in ability slot but for Use over time UOT it can also be checked in the ability itself. 
-        throw new NotImplementedException();
+        // may need to modify later but if the strategy type doesn't have a delay on it based on some state change then use regular skill, this is intended to prevent two intance of Use firing at once.
+        //if(skill.targetingStrategy is not DelayedTargeting)
+        //{
+        //    skill.Use(this.gameObject);
+        //}
+        //else
+        //{
+        //    skill.Use(this.gameObject, wasTriggerFired);
+        //}
+        Debug.Log("starting targeting");
+        skill.Use(this.gameObject, wasTriggerFired);
+
     }
     public void SetAbility(Ability abilitySet)
     {
@@ -36,6 +47,7 @@ public class AbilitySlot : NetworkBehaviour
         Debug.Log("Skill slot now contains " + skill.name);
         AbilityEquipStatusChange?.Invoke(skill);
     }
+
 
     public void ClearAbility()
     {

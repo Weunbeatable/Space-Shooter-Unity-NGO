@@ -13,7 +13,8 @@ public class ShipPlayer : NetworkBehaviour
     [Header("References")]
     [SerializeField] CinemachineVirtualCamera cinemachineVirtualCamera;
     [SerializeField] CinemachineVirtualCamera thirdPersonCam;
-    [SerializeField] CinemachineVirtualCamera announcementCamera; 
+    [SerializeField] CinemachineVirtualCamera announcementCamera;
+    [SerializeField] CinemachineVirtualCamera abilityCamera;
     [SerializeField] private SpriteRenderer minimapIconRenderer;
     [SerializeField] AbilitySpawner spawnerInstance;
 
@@ -22,6 +23,8 @@ public class ShipPlayer : NetworkBehaviour
     [SerializeField] public int ownerSeconndaryPriority { get; set; } = 14;
 
     [SerializeField] public int announcementPriority { get; set; } = 11;
+
+    [SerializeField] public int abilityPriority { get; set; } = 10;
 
     [SerializeField] private Color ownerColor;
     [field: SerializeField] public Rigidbody playerBody { get; set; }
@@ -123,5 +126,21 @@ public class ShipPlayer : NetworkBehaviour
         playerBody.position = location;
     }
 
+    public void SetAbilityPriority(int priorityvalue)
+    {
+        abilityPriority = priorityvalue;
+        abilityCamera.Priority = abilityPriority;
+    }
 
+    public void AbiltyCameraPriorityReset()
+    {
+        abilityPriority = 10;
+        abilityCamera.Priority = abilityPriority;   
+    }
+
+    public void AssignAbilityLookTarget(Transform lookAt, Transform target)
+    {
+        abilityCamera.LookAt = lookAt;
+        abilityCamera.Follow = target;
+    }
 }

@@ -6,4 +6,6 @@ using UnityEngine;
 public abstract class TargetingStrategy : NetworkBehaviour
 {
     public abstract void StartTargeting(GameObject user);
+
+    public abstract void StartTargeting(GameObject user, bool statehasSwitched);
 }

@@ -10,4 +10,9 @@ public class DirectionalTargeting : TargetingStrategy
     {
         print("looking At Direction to Target");
     }
+
+    public override void StartTargeting(GameObject user, bool statehasSwitched)
+    {
+        throw new System.NotImplementedException();
+    }
 }

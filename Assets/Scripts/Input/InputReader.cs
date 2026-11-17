@@ -25,7 +25,9 @@ public class InputReader : ScriptableObject, IPlayerActions
     public bool IsUsingGamepad { get; private set; } // for control scheme updates and ui visual changes.
 
     public bool IsMapOpen { get; private set; }
-    public bool IsBoosting { get; private set; }    
+    public bool IsBoosting { get; private set; }
+    
+    public bool IsFiring { get; private set; }
 
     private Controls controls;
 
@@ -51,10 +53,12 @@ public class InputReader : ScriptableObject, IPlayerActions
         if (context.performed)
         {
             PrimaryFireEvent?.Invoke(true);
+            IsFiring = true;
         }
         else if (context.canceled)
         {
             PrimaryFireEvent?.Invoke(false);
+            IsFiring = false;
         }
        
     }

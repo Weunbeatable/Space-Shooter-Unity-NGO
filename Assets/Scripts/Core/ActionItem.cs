@@ -8,4 +8,8 @@ public virtual void Use(GameObject user)
     {
         Debug.Log("Using ability" + this);
     }
+    public virtual void Use(GameObject user, bool triggerState)
+    {
+        Debug.Log("Using ability" + this);
+    }
 }

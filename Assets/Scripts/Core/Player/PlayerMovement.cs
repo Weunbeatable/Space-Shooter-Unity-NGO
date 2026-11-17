@@ -202,4 +202,5 @@ public class PlayerMovement : NetworkBehaviour
                 spinAmmount ), spinDuration, RotateMode.LocalAxisAdd).SetEase(Ease.OutSine).OnComplete(() => isSpinning = false);
         }
     }
+    public InputReader GetInputReader() => inputReader;
 }

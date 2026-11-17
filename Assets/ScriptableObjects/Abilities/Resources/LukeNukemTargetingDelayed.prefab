@@ -27,7 +27,7 @@ Transform:
   m_GameObject: {fileID: 163990972873050001}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -82.53538, y: -263.80875, z: 1607.2485}
+  m_LocalPosition: {x: -0.9999997, y: -0.9999997, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -69,5 +69,7 @@ MonoBehaviour:
   cursorTexture: {fileID: 2800000, guid: 6f6c2d827b5ed454b90a1529cefe9041, type: 3}
   cursorHotspot: {x: 0, y: 0}
   inputReader: {fileID: 11400000, guid: 2b0ed51268b2b1f46af1702daa4f5fef, type: 2}
-  hasTargettingStarted: 0
+  hasTargettingStarted: 1
   playerReference: {fileID: 0}
+  cursorTarget: {fileID: 7772171822559072123}
+  controllerAimSpeed: 1.5
